@@ -1,0 +1,57 @@
+# ============================================
+# CyberQuill .gitignore
+# ============================================
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ---------- Virtual Environment ----------
+venv/
+.venv/
+env/
+ENV/
+
+# ---------- Environment Variables (SECRETS) ----------
+.env
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- ChromaDB Vector Store ----------
+chroma_db/
+*.chromadb
+
+# ---------- Generated Output ----------
+data/output/*.json
+data/output/*.pdf
+
+# ---------- Logs ----------
+logs/
+*.log
+
+# ---------- Streamlit ----------
+.streamlit/secrets.toml
+
+# ---------- Jupyter ----------
+.ipynb_checkpoints/
+
+# ---------- Testing ----------
+.pytest_cache/
+htmlcov/
+.coverage
