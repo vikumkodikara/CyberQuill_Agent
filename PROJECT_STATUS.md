@@ -11,11 +11,11 @@
 
 | Field | Value |
 |-------|---------|
-| **Date** | 2026-07-21 |
-| **Current Phase** | Phase 6 — Writer Agent |
+| **Date** | 2026-07-22 |
+| **Current Phase** | Phase 7 — Reviewer Agent |
 | **Phase Status** | ⏳ Ready to start |
 | **Git Branch** | `main` |
-| **Last Commit** | `2f1cf7e` feat: implement RAG Agent with ChromaDB vector store and knowledge base documents |
+| **Last Commit** | `e6f5dd0` feat: implement Writer Agent with LLM and template-based article generation |
 | **Remote** | `https://github.com/vikumkodikara/CyberQuill_Agent.git` |
 
 ---
@@ -29,7 +29,7 @@
 | Phase 3 | Duplicate Agent | ✅ Complete |
 | Phase 4 | Classification Agent | ✅ Complete |
 | Phase 5 | RAG Agent | ✅ Complete |
-| Phase 6 | Writer Agent | ⬜ Not started |
+| Phase 6 | Writer Agent | ✅ Complete |
 | Phase 7 | Reviewer Agent | ⬜ Not started |
 | Phase 8 | PDF Generator | ⬜ Not started |
 | Phase 9 | LangGraph Orchestrator | ⬜ Not started |
@@ -66,6 +66,8 @@
 | `data/documents/owasp_top_10.md` | ✅ Created | OWASP Top 10 knowledge base document |
 | `data/documents/nist_csf.md` | ✅ Created | NIST CSF 2.0 knowledge base document |
 | `data/documents/mitre_attack.md` | ✅ Created | MITRE ATT&CK framework knowledge base document |
+| `agents/writer.py` | ✅ Created | Writer Agent — LLM (Groq) + template fallback article generation |
+| `tests/test_writer.py` | ✅ Created | 27 tests for the Writer Agent |
 
 ---
 
@@ -120,5 +122,7 @@ Work incrementally, explain every decision, and wait for my approval before gene
 | 6 | `feat: implement Classification Agent with LLM and keyword fallback` | Phase 4 | 2026-07-21 |
 | 7 | `docs: update project status after Phase 4 completion` | Phase 4 | 2026-07-21 |
 | 8 | `feat: implement RAG Agent with ChromaDB vector store and knowledge base documents` | Phase 5 | 2026-07-21 |
+| 9 | `docs: update project status after Phase 5 completion` | Phase 5 | 2026-07-21 |
+| 10 | `feat: implement Writer Agent with LLM and template-based article generation` | Phase 6 | 2026-07-22 |
 
 > This table will be updated as commits are made.
