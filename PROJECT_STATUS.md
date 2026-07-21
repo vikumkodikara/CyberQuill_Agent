@@ -12,10 +12,10 @@
 | Field | Value |
 |-------|---------|
 | **Date** | 2026-07-21 |
-| **Current Phase** | Phase 4 — Classification Agent |
+| **Current Phase** | Phase 5 — RAG Agent |
 | **Phase Status** | ⏳ Ready to start |
 | **Git Branch** | `main` |
-| **Last Commit** | `c68dae7` feat: implement Duplicate Agent with 3-layer detection |
+| **Last Commit** | `1a265ef` feat: implement Classification Agent with LLM and keyword fallback |
 | **Remote** | `https://github.com/vikumkodikara/CyberQuill_Agent.git` |
 
 ---
@@ -27,7 +27,7 @@
 | Phase 1 | Repository Setup | ✅ Complete |
 | Phase 2 | Collector Agent | ✅ Complete |
 | Phase 3 | Duplicate Agent | ✅ Complete |
-| Phase 4 | Classification Agent | ⬜ Not started |
+| Phase 4 | Classification Agent | ✅ Complete |
 | Phase 5 | RAG Agent | ⬜ Not started |
 | Phase 6 | Writer Agent | ⬜ Not started |
 | Phase 7 | Reviewer Agent | ⬜ Not started |
@@ -59,6 +59,8 @@
 | `tests/test_collector.py` | ✅ Created | 19 tests (14 unit + 5 integration) for the Collector Agent |
 | `agents/duplicate.py` | ✅ Created | Duplicate Agent — 3-layer dedup (URL, normalized URL, fuzzy title) |
 | `tests/test_duplicate.py` | ✅ Created | 27 tests for the Duplicate Agent |
+| `agents/classifier.py` | ✅ Created | Classification Agent — LLM (Groq) + keyword fallback |
+| `tests/test_classifier.py` | ✅ Created | 19 tests (18 unit + 1 pipeline integration) |
 
 ---
 
@@ -109,5 +111,7 @@ Work incrementally, explain every decision, and wait for my approval before gene
 | 2 | `feat: implement Collector Agent with RSS feed parsing and normalization` | Phase 2 | 2026-07-21 |
 | 3 | `docs: update project status after Phase 2 completion` | Phase 2 | 2026-07-21 |
 | 4 | `feat: implement Duplicate Agent with 3-layer detection (URL, normalized URL, fuzzy title)` | Phase 3 | 2026-07-21 |
+| 5 | `docs: update project status after Phase 3 completion` | Phase 3 | 2026-07-21 |
+| 6 | `feat: implement Classification Agent with LLM and keyword fallback` | Phase 4 | 2026-07-21 |
 
 > This table will be updated as commits are made.
