@@ -12,10 +12,10 @@
 | Field | Value |
 |-------|---------|
 | **Date** | 2026-07-21 |
-| **Current Phase** | Phase 5 — RAG Agent |
+| **Current Phase** | Phase 6 — Writer Agent |
 | **Phase Status** | ⏳ Ready to start |
 | **Git Branch** | `main` |
-| **Last Commit** | `1a265ef` feat: implement Classification Agent with LLM and keyword fallback |
+| **Last Commit** | `2f1cf7e` feat: implement RAG Agent with ChromaDB vector store and knowledge base documents |
 | **Remote** | `https://github.com/vikumkodikara/CyberQuill_Agent.git` |
 
 ---
@@ -28,7 +28,7 @@
 | Phase 2 | Collector Agent | ✅ Complete |
 | Phase 3 | Duplicate Agent | ✅ Complete |
 | Phase 4 | Classification Agent | ✅ Complete |
-| Phase 5 | RAG Agent | ⬜ Not started |
+| Phase 5 | RAG Agent | ✅ Complete |
 | Phase 6 | Writer Agent | ⬜ Not started |
 | Phase 7 | Reviewer Agent | ⬜ Not started |
 | Phase 8 | PDF Generator | ⬜ Not started |
@@ -61,6 +61,11 @@
 | `tests/test_duplicate.py` | ✅ Created | 27 tests for the Duplicate Agent |
 | `agents/classifier.py` | ✅ Created | Classification Agent — LLM (Groq) + keyword fallback |
 | `tests/test_classifier.py` | ✅ Created | 19 tests (18 unit + 1 pipeline integration) |
+| `agents/rag.py` | ✅ Created | RAG Agent — ChromaDB, document chunking, semantic retrieval |
+| `tests/test_rag.py` | ✅ Created | 24 tests (19 unit/integration + 5 retrieval evaluation) |
+| `data/documents/owasp_top_10.md` | ✅ Created | OWASP Top 10 knowledge base document |
+| `data/documents/nist_csf.md` | ✅ Created | NIST CSF 2.0 knowledge base document |
+| `data/documents/mitre_attack.md` | ✅ Created | MITRE ATT&CK framework knowledge base document |
 
 ---
 
@@ -113,5 +118,7 @@ Work incrementally, explain every decision, and wait for my approval before gene
 | 4 | `feat: implement Duplicate Agent with 3-layer detection (URL, normalized URL, fuzzy title)` | Phase 3 | 2026-07-21 |
 | 5 | `docs: update project status after Phase 3 completion` | Phase 3 | 2026-07-21 |
 | 6 | `feat: implement Classification Agent with LLM and keyword fallback` | Phase 4 | 2026-07-21 |
+| 7 | `docs: update project status after Phase 4 completion` | Phase 4 | 2026-07-21 |
+| 8 | `feat: implement RAG Agent with ChromaDB vector store and knowledge base documents` | Phase 5 | 2026-07-21 |
 
 > This table will be updated as commits are made.
