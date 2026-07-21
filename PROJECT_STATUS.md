@@ -12,10 +12,10 @@
 | Field | Value |
 |-------|---------|
 | **Date** | 2026-07-21 |
-| **Current Phase** | Phase 2 — Collector Agent |
+| **Current Phase** | Phase 3 — Duplicate Agent |
 | **Phase Status** | ⏳ Ready to start |
 | **Git Branch** | `main` |
-| **Last Commit** | `a221c0e` feat: initialize project structure with config, models, and utilities |
+| **Last Commit** | `1ae92a0` feat: implement Collector Agent with RSS feed parsing and normalization |
 | **Remote** | `https://github.com/vikumkodikara/CyberQuill_Agent.git` |
 
 ---
@@ -25,7 +25,7 @@
 | Phase | Description | Status |
 |-------|-------------|--------|
 | Phase 1 | Repository Setup | ✅ Complete |
-| Phase 2 | Collector Agent | ⬜ Not started |
+| Phase 2 | Collector Agent | ✅ Complete |
 | Phase 3 | Duplicate Agent | ⬜ Not started |
 | Phase 4 | Classification Agent | ⬜ Not started |
 | Phase 5 | RAG Agent | ⬜ Not started |
@@ -55,6 +55,8 @@
 | `IMPLEMENTATION_PLAN.md` | ✅ Created | Full project plan and architecture decisions |
 | `PROJECT_STATUS.md` | ✅ Created | This status tracker file |
 | All `__init__.py` files | ✅ Created | Package initializers for agents, config, models, orchestrator, pdf, tests, utils |
+| `agents/collector.py` | ✅ Created | Collector Agent — RSS feed fetching and normalization |
+| `tests/test_collector.py` | ✅ Created | 19 tests (14 unit + 5 integration) for the Collector Agent |
 
 ---
 
@@ -102,5 +104,6 @@ Work incrementally, explain every decision, and wait for my approval before gene
 | # | Commit Message | Phase | Date |
 |---|----------------|-------|------|
 | 1 | `feat: initialize project structure with config, models, and utilities` | Phase 1 | 2026-07-21 |
+| 2 | `feat: implement Collector Agent with RSS feed parsing and normalization` | Phase 2 | 2026-07-21 |
 
 > This table will be updated as commits are made.
