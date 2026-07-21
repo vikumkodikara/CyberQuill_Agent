@@ -12,10 +12,10 @@
 | Field | Value |
 |-------|---------|
 | **Date** | 2026-07-21 |
-| **Current Phase** | Phase 3 — Duplicate Agent |
+| **Current Phase** | Phase 4 — Classification Agent |
 | **Phase Status** | ⏳ Ready to start |
 | **Git Branch** | `main` |
-| **Last Commit** | `1ae92a0` feat: implement Collector Agent with RSS feed parsing and normalization |
+| **Last Commit** | `c68dae7` feat: implement Duplicate Agent with 3-layer detection |
 | **Remote** | `https://github.com/vikumkodikara/CyberQuill_Agent.git` |
 
 ---
@@ -26,7 +26,7 @@
 |-------|-------------|--------|
 | Phase 1 | Repository Setup | ✅ Complete |
 | Phase 2 | Collector Agent | ✅ Complete |
-| Phase 3 | Duplicate Agent | ⬜ Not started |
+| Phase 3 | Duplicate Agent | ✅ Complete |
 | Phase 4 | Classification Agent | ⬜ Not started |
 | Phase 5 | RAG Agent | ⬜ Not started |
 | Phase 6 | Writer Agent | ⬜ Not started |
@@ -57,6 +57,8 @@
 | All `__init__.py` files | ✅ Created | Package initializers for agents, config, models, orchestrator, pdf, tests, utils |
 | `agents/collector.py` | ✅ Created | Collector Agent — RSS feed fetching and normalization |
 | `tests/test_collector.py` | ✅ Created | 19 tests (14 unit + 5 integration) for the Collector Agent |
+| `agents/duplicate.py` | ✅ Created | Duplicate Agent — 3-layer dedup (URL, normalized URL, fuzzy title) |
+| `tests/test_duplicate.py` | ✅ Created | 27 tests for the Duplicate Agent |
 
 ---
 
@@ -105,5 +107,7 @@ Work incrementally, explain every decision, and wait for my approval before gene
 |---|----------------|-------|------|
 | 1 | `feat: initialize project structure with config, models, and utilities` | Phase 1 | 2026-07-21 |
 | 2 | `feat: implement Collector Agent with RSS feed parsing and normalization` | Phase 2 | 2026-07-21 |
+| 3 | `docs: update project status after Phase 2 completion` | Phase 2 | 2026-07-21 |
+| 4 | `feat: implement Duplicate Agent with 3-layer detection (URL, normalized URL, fuzzy title)` | Phase 3 | 2026-07-21 |
 
 > This table will be updated as commits are made.
