@@ -7,13 +7,16 @@ Shows classification confidence and category distribution.
 """
 
 import streamlit as st
+import pandas as pd
+from utils.theme import render_page_header, get_category_badge_html
 
 st.set_page_config(page_title="Categories — CyberQuill", page_icon="🏷️", layout="wide")
 
-st.title("🏷️ Categories")
-st.markdown("Articles classified by threat category using LLM and keyword analysis.")
-st.divider()
-
+render_page_header(
+    title="Threat Classification",
+    subtitle="Articles categorized into cybersecurity threat vectors using LLM intelligence and keyword analysis.",
+    icon="🏷️"
+)
 
 # ============================================
 # Pipeline: Collect → Deduplicate → Classify
@@ -32,16 +35,18 @@ def _get_classified_articles():
     return classified
 
 
-with st.spinner("Collecting, deduplicating, and classifying articles..."):
+with st.spinner("Analyzing threat signals & classifying categories..."):
     try:
         classified = _get_classified_articles()
     except Exception as e:
         st.error(f"Pipeline failed: {e}")
         classified = []
 
-if st.button("🔄 Re-classify", use_container_width=False):
-    st.cache_data.clear()
-    st.rerun()
+col_act, col_spacer = st.columns([1, 4])
+with col_act:
+    if st.button("🔄 Re-classify", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
 
 if not classified:
     st.warning("No classified articles available.")
@@ -52,64 +57,67 @@ if not classified:
 # Category Distribution
 # ============================================
 
-st.subheader("📊 Category Distribution")
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-top:1.5rem; margin-bottom:1rem;'>📊 Threat Category Breakdown</h4>", unsafe_allow_html=True)
 
 categories: dict[str, int] = {}
 for article in classified:
     categories[article.category] = categories.get(article.category, 0) + 1
 
-# Bar chart
-import pandas as pd
-df = pd.DataFrame(
-    sorted(categories.items(), key=lambda x: x[1], reverse=True),
-    columns=["Category", "Count"],
-)
-st.bar_chart(df, x="Category", y="Count", color="#42a5f5")
-
-# Metrics row
+# Metrics grid
 cols = st.columns(min(len(categories), 4))
 for i, (cat, count) in enumerate(sorted(categories.items(), key=lambda x: x[1], reverse=True)):
     with cols[i % len(cols)]:
-        st.metric(cat, count)
+        st.metric(cat, f"{count} Articles")
 
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Bar chart
+df = pd.DataFrame(
+    sorted(categories.items(), key=lambda x: x[1], reverse=True),
+    columns=["Threat Category", "Article Count"],
+)
+st.bar_chart(df, x="Threat Category", y="Article Count", color="#6366f1")
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
 # Category Filter & Articles
 # ============================================
 
-st.subheader("📰 Articles by Category")
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>📰 Articles by Threat Category</h4>", unsafe_allow_html=True)
 
 selected_cat = st.selectbox(
-    "Select category",
-    options=["All"] + sorted(categories.keys()),
+    "Filter by Category",
+    options=["All Categories"] + sorted(categories.keys()),
 )
 
-if selected_cat == "All":
+if selected_cat == "All Categories":
     display_articles = classified
 else:
     display_articles = [a for a in classified if a.category == selected_cat]
 
-st.caption(f"Showing {len(display_articles)} articles")
+st.caption(f"Displaying **{len(display_articles)}** articles")
+st.markdown("<br>", unsafe_allow_html=True)
 
 for article in display_articles:
-    with st.container(border=True):
-        col_title, col_badge = st.columns([4, 1])
-        with col_title:
-            st.markdown(f"### [{article.title}]({article.link})")
-        with col_badge:
-            st.markdown(
-                f"<span style='background:#e3f2fd;color:#1565c0;padding:4px 12px;"
-                f"border-radius:20px;font-size:0.8rem;font-weight:600'>"
-                f"{article.category}</span>",
-                unsafe_allow_html=True,
-            )
-
-        meta_col, conf_col = st.columns([3, 1])
-        with meta_col:
-            st.caption(f"📡 {article.source}  •  🗓️ {article.published or 'Unknown'}")
-        with conf_col:
-            confidence_pct = int(article.confidence * 100)
-            st.caption(f"🎯 Confidence: {confidence_pct}%")
-
-        if article.summary:
-            st.markdown(article.summary[:250] + ("..." if len(article.summary) > 250 else ""))
+    badge_html = get_category_badge_html(article.category)
+    conf_pct = int(article.confidence * 100)
+    
+    st.markdown(f"""
+    <div class="article-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 0.6rem;">
+            <a href="{article.link}" target="_blank" style="font-family:'Space Grotesk', sans-serif; font-size:1.2rem; font-weight:700; color:#0f172a; text-decoration:none;">
+                {article.title} ↗
+            </a>
+            {badge_html}
+        </div>
+        <div style="display:flex; gap:16px; margin-bottom:0.75rem; font-size:0.82rem; color:#64748b; align-items:center;">
+            <span>📡 <b>Source:</b> {article.source}</span>
+            <span>🗓️ <b>Published:</b> {article.published or 'Recent'}</span>
+            <span style="color:#4f46e5; font-weight:700;">🎯 <b>AI Confidence:</b> {conf_pct}%</span>
+        </div>
+        <div style="font-size:0.92rem; color:#475569; line-height:1.55;">
+            {article.summary[:300] + ("..." if len(article.summary) > 300 else "") if article.summary else "No preview summary available."}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
