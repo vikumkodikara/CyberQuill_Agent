@@ -214,18 +214,19 @@ def _parse_review_response(text: str) -> ReviewResult:
     import re
 
     # Extract quality score
-    score_match = re.search(r"Quality Score[:\s]*(\d+)", text, re.IGNORECASE)
+    # Handles both "Quality Score: 9" and "**Quality Score**: 9"
+    score_match = re.search(r"\**Quality Score\**[:\s]*(\d+)", text, re.IGNORECASE)
     score = int(score_match.group(1)) if score_match else 5
     score = max(1, min(10, score))
 
     # Extract approved status
-    approved_match = re.search(r"Approved[:\s]*(YES|NO)", text, re.IGNORECASE)
+    approved_match = re.search(r"\**Approved\**[:\s]*(YES|NO)", text, re.IGNORECASE)
     approved = approved_match.group(1).upper() == "YES" if approved_match else (score >= APPROVAL_THRESHOLD)
 
     # Extract issues
     issues = []
     issues_match = re.search(
-        r"Issues Found[:\s]*(.*?)(?=\n\s*[-*]?\s*\**Revised|\Z)",
+        r"\**Issues Found\**[:\s]*(.*?)(?=\n\s*[-*]?\s*\**Revised|\Z)",
         text,
         re.IGNORECASE | re.DOTALL,
     )
@@ -240,7 +241,7 @@ def _parse_review_response(text: str) -> ReviewResult:
 
     # Extract revised article (if provided)
     revised_match = re.search(
-        r"Revised Article[:\s]*(.*)",
+        r"\**Revised Article\**[:\s]*(.*)",
         text,
         re.IGNORECASE | re.DOTALL,
     )
