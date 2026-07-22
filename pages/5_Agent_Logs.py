@@ -8,13 +8,15 @@ Allows filtering by log level and agent name with auto-refresh.
 
 import streamlit as st
 from pathlib import Path
+from utils.theme import render_page_header
 
 st.set_page_config(page_title="Agent Logs — CyberQuill", page_icon="📋", layout="wide")
 
-st.title("📋 Agent Logs")
-st.markdown("Monitor pipeline execution and debug agent behaviour.")
-st.divider()
-
+render_page_header(
+    title="Agent Observability & Logs",
+    subtitle="Monitor real-time pipeline execution, agent state transitions, and structured debug telemetry.",
+    icon="📋"
+)
 
 # ============================================
 # Log File Path
@@ -22,49 +24,50 @@ st.divider()
 
 LOG_FILE = Path("logs/cyberquill.log")
 
-
 # ============================================
-# Controls
+# Controls Header
 # ============================================
 
 col_refresh, col_clear, col_lines = st.columns([1, 1, 2])
 
 with col_refresh:
-    if st.button("🔄 Refresh", use_container_width=True):
+    if st.button("🔄 Refresh Logs", use_container_width=True):
         st.rerun()
 
 with col_clear:
     if st.button("🗑️ Clear Logs", use_container_width=True):
         try:
             LOG_FILE.write_text("")
-            st.success("Logs cleared.")
+            st.success("Logs cleared successfully.")
             st.rerun()
         except Exception as e:
-            st.error(f"Failed to clear logs: {e}")
+            st.error(f"Failed to clear log file: {e}")
 
 with col_lines:
-    max_lines = st.slider("Lines to show", 50, 500, 200, step=50)
+    max_lines = st.slider("Max Log Lines", 50, 500, 200, step=50)
 
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
 # Filters
 # ============================================
 
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>🔎 Filter Telemetry</h4>", unsafe_allow_html=True)
+
 col_level, col_agent = st.columns(2)
 
 with col_level:
     level_filter = st.multiselect(
-        "Filter by log level",
+        "Filter by Log Level",
         options=["DEBUG", "INFO", "WARNING", "ERROR"],
         default=["INFO", "WARNING", "ERROR"],
     )
 
 with col_agent:
     agent_filter = st.text_input(
-        "Filter by agent/module",
-        placeholder="e.g. collector, classifier, rag",
+        "Filter by Agent or Module",
+        placeholder="e.g. collector, duplicate, classifier, rag, writer, reviewer",
     )
-
 
 # ============================================
 # Log Display
@@ -72,8 +75,8 @@ with col_agent:
 
 if not LOG_FILE.exists():
     st.info(
-        "📭 No log file found. Run the pipeline to generate logs.\n\n"
-        f"Expected path: `{LOG_FILE.resolve()}`"
+        "📭 No log stream detected. Run the pipeline from **Generate Magazine** page to generate real-time logs.\n\n"
+        f"Target log path: `{LOG_FILE.resolve()}`"
     )
     st.stop()
 
@@ -84,61 +87,56 @@ except Exception as e:
     st.stop()
 
 if not lines or (len(lines) == 1 and not lines[0].strip()):
-    st.info("Log file is empty. Run the pipeline to generate logs.")
+    st.info("Log stream is currently empty. Execute the pipeline to capture telemetry.")
     st.stop()
 
 # Apply filters
 filtered_lines = []
 for line in lines:
-    # Level filter
     if level_filter:
         if not any(f"| {level}" in line for level in level_filter):
             continue
 
-    # Agent filter
     if agent_filter:
         if agent_filter.lower() not in line.lower():
             continue
 
     filtered_lines.append(line)
 
-# Show latest lines (tail)
 display_lines = filtered_lines[-max_lines:]
 
-st.caption(
-    f"Showing {len(display_lines)} of {len(filtered_lines)} filtered lines "
-    f"({len(lines)} total)"
-)
+st.caption(f"Displaying **{len(display_lines)}** of **{len(filtered_lines)}** filtered events ({len(lines)} total in log file)")
 
-# Colour-coded log display
+# Terminal container
 log_html = []
 for line in display_lines:
     if "| ERROR" in line:
-        color = "#e53935"
+        color = "#f87171"
+        bg = "rgba(239, 68, 68, 0.1)"
     elif "| WARNING" in line:
-        color = "#f57c00"
+        color = "#fbbf24"
+        bg = "rgba(245, 158, 11, 0.08)"
     elif "| DEBUG" in line:
-        color = "#9e9e9e"
+        color = "#94a3b8"
+        bg = "transparent"
     else:
-        color = "#333"
+        color = "#38bdf8"
+        bg = "transparent"
 
     escaped = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    log_html.append(f'<div style="color:{color};font-family:monospace;font-size:0.82rem;'
-                    f'padding:2px 0;border-bottom:1px solid #f0f0f0">{escaped}</div>')
+    log_html.append(f'<div style="color:{color}; background:{bg}; font-family:\'Courier New\', monospace; font-size:0.83rem; padding:4px 8px; border-radius:4px; margin-bottom:2px; border-bottom:1px solid rgba(255,255,255,0.03);">{escaped}</div>')
 
 st.markdown(
-    f'<div style="background:#fafafa;padding:1rem;border-radius:8px;'
-    f'max-height:600px;overflow-y:auto">{"".join(log_html)}</div>',
+    f'<div style="background:#090d16; padding:1.25rem; border-radius:14px; max-height:550px; overflow-y:auto; border:1px solid #1e293b; box-shadow:0 10px 30px rgba(0,0,0,0.3);">{"".join(log_html)}</div>',
     unsafe_allow_html=True,
 )
-
 
 # ============================================
 # Log Statistics
 # ============================================
 
-st.divider()
-st.subheader("📊 Log Statistics")
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>📊 Telemetry Statistics</h4>", unsafe_allow_html=True)
 
 level_counts = {"DEBUG": 0, "INFO": 0, "WARNING": 0, "ERROR": 0}
 for line in lines:
