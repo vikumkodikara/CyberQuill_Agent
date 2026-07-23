@@ -1,11 +1,10 @@
 """
-CyberQuill — Agent Logs Page (Debug Mode Only)
+CyberQuill — Agent Logs Page
 =================================================
 
 Displays the structured log file from the CyberQuill pipeline.
 Allows filtering by log level and agent name with auto-refresh.
-
-This page is only visible in Debug Mode.
+Full terminal aesthetic with color-coded log levels.
 """
 
 import streamlit as st
@@ -56,7 +55,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Filters
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🔎 Filter Telemetry</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // FILTER TELEMETRY
+</div>
+""", unsafe_allow_html=True)
 
 col_level, col_agent = st.columns(2)
 
@@ -111,27 +114,47 @@ display_lines = filtered_lines[-max_lines:]
 
 st.caption(f"Displaying **{len(display_lines)}** of **{len(filtered_lines)}** filtered events ({len(lines)} total in log file)")
 
-# Terminal container
+# Terminal container — color coded
 log_html = []
 for line in display_lines:
     if "| ERROR" in line:
-        color = "#f87171"
-        bg = "rgba(239, 68, 68, 0.1)"
+        color = "#FF3366"
+        bg = "#FF336608"
     elif "| WARNING" in line:
-        color = "#fbbf24"
-        bg = "rgba(245, 158, 11, 0.08)"
+        color = "#FCD34D"
+        bg = "#FCD34D08"
     elif "| DEBUG" in line:
-        color = "#94a3b8"
+        color = "#64748B"
         bg = "transparent"
     else:
-        color = "#38bdf8"
+        color = "#00D4FF"
         bg = "transparent"
 
     escaped = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    log_html.append(f'<div style="color:{color}; background:{bg}; font-family:\'Courier New\', monospace; font-size:0.83rem; padding:4px 8px; border-radius:4px; margin-bottom:2px; border-bottom:1px solid rgba(255,255,255,0.03);">{escaped}</div>')
+
+    # Highlight agent names in purple
+    for agent in ["collector", "duplicate", "classifier", "rag", "writer", "reviewer", "generator"]:
+        if agent in escaped.lower():
+            import re
+            escaped = re.sub(
+                rf"(\b{agent}\b)",
+                r'<span style="color: #A78BFA;">\1</span>',
+                escaped,
+                flags=re.IGNORECASE,
+            )
+            break
+
+    # Dim timestamps
+    escaped = re.sub(
+        r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})",
+        r'<span style="color: #374151;">\1</span>',
+        escaped,
+    )
+
+    log_html.append(f'<div style="color:{color}; background:{bg}; font-family: JetBrains Mono, monospace; font-size: 12px; padding: 3px 8px; border-radius: 2px; margin-bottom: 1px; line-height: 1.8; border-bottom: 1px solid #ffffff05;">{escaped}</div>')
 
 st.markdown(
-    f'<div style="background:#090d16; padding:1.25rem; border-radius:14px; max-height:550px; overflow-y:auto; border:1px solid #1e293b; box-shadow:0 10px 30px rgba(0,0,0,0.3);">{"".join(log_html)}</div>',
+    f'<div style="background: #030712; padding: 20px; border-radius: 8px; max-height: 600px; overflow-y: auto; border: 1px solid #1F2937;">{"".join(log_html)}</div>',
     unsafe_allow_html=True,
 )
 
@@ -140,7 +163,11 @@ st.markdown(
 # ============================================
 
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📊 Telemetry Statistics</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // TELEMETRY STATISTICS
+</div>
+""", unsafe_allow_html=True)
 
 level_counts = {"DEBUG": 0, "INFO": 0, "WARNING": 0, "ERROR": 0}
 for line in lines:

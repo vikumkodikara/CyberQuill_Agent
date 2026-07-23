@@ -25,24 +25,53 @@ render_page_header(
 )
 
 # ============================================
-# Pipeline Controls
+# Pipeline Preview (7 agents)
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>Generate Magazine</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // PIPELINE AGENTS
+</div>
+""", unsafe_allow_html=True)
+
+agent_cols = st.columns(7)
+agents = [
+    ("📡", "Collect", "#00D4FF"),
+    ("🔍", "Dedup", "#A78BFA"),
+    ("🏷️", "Classify", "#FF3366"),
+    ("📚", "RAG", "#34D399"),
+    ("✍️", "Write", "#FCD34D"),
+    ("📝", "Review", "#FF6B00"),
+    ("📄", "PDF", "#00D4FF"),
+]
+for i, (icon, name, color) in enumerate(agents):
+    with agent_cols[i]:
+        st.markdown(f"""
+        <div style="background: #111827; border: 1px solid #1F2937; border-top: 2px solid {color}; border-radius: 8px; padding: 12px 6px; text-align: center;">
+            <div style="font-size: 1.4rem;">{icon}</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: #F1F5F9; margin-top: 4px;">{name}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ============================================
+# Generate Controls
+# ============================================
 
 col_run, col_opts = st.columns([1, 2])
 
 with col_opts:
     st.markdown("""
-    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1rem 1.25rem;">
-        <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">How it works</div>
-        <div style="font-size:0.85rem; color:#64748b;">CyberQuill gathers the latest cybersecurity news, enriches it with expert context, and compiles a professionally written magazine PDF.</div>
+    <div style="background: #111827; border: 1px solid #1F2937; border-radius: 8px; padding: 16px 20px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">// HOW IT WORKS</div>
+        <div style="font-size: 13px; color: #94A3B8; line-height: 1.6;">CyberQuill gathers the latest cybersecurity news, enriches it with expert context from OWASP/NIST/MITRE frameworks, and compiles a professionally written magazine PDF.</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col_run:
     run_clicked = st.button(
-        "📰 Generate Magazine",
+        "◈ GENERATE MAGAZINE",
         type="primary",
         use_container_width=True,
     )
@@ -122,8 +151,8 @@ if run_clicked:
         from utils.issue_tracker import get_current_issue_number
         issue_num = get_current_issue_number()
         pdf_path = generate_pdf(magazine_articles)
-        progress_bar.progress(1.0, text="✅ Issue Published Successfully!")
-        status_box.success(f"📄 Magazine issue ready for download!")
+        progress_bar.progress(1.0, text="✅ Magazine Generated Successfully!")
+        status_box.success(f"📄 Magazine ready for download!")
 
         # Store in session state
         st.session_state["pipeline_result"] = {
@@ -155,9 +184,14 @@ if run_clicked:
 if "pipeline_result" in st.session_state:
     res = st.session_state["pipeline_result"]
 
-    st.markdown("<br><hr>", unsafe_allow_html=True)
+    st.markdown('<div style="border-top: 1px solid #1F2937; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📊 Issue Summary</h4>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+        // ISSUE SUMMARY
+    </div>
+    """, unsafe_allow_html=True)
+
     m1, m2, m3 = st.columns(3)
     m1.metric("News Sources", res["raw_count"])
     m2.metric("Unique Stories", res["unique_count"])
@@ -171,10 +205,10 @@ if "pipeline_result" in st.session_state:
         if p_path.exists():
             issue_num = res.get("issue_number", "—")
             st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color:white; padding:2rem; border-radius:18px; border:1px solid #6366f1; text-align:center; box-shadow:0 15px 30px rgba(15,23,42,0.3); margin-bottom:2rem;">
-                <div style="font-size:2rem; margin-bottom:0.5rem;">📄</div>
-                <h3 style="font-family:'Space Grotesk', sans-serif; margin:0 0 0.5rem 0; color:#ffffff;">CyberQuill Issue #{issue_num:03d} is Ready!</h3>
-                <p style="color:#94a3b8; font-size:0.95rem; margin-bottom:1.5rem;">Published {res['timestamp']} with {res['magazine_count']} curated articles.</p>
+            <div style="background: linear-gradient(135deg, #0D1117 0%, #1a1040 100%); color: white; padding: 2rem; border-radius: 12px; border: 1px solid #7C3AED33; text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+                <h3 style="font-family: 'JetBrains Mono', monospace; margin: 0 0 0.5rem 0; color: #00D4FF; font-size: 18px; letter-spacing: 0.08em;">CYBERQUILL ISSUE #{issue_num:03d} READY</h3>
+                <p style="color: #64748B; font-size: 13px; font-family: 'JetBrains Mono', monospace; margin-bottom: 1.5rem;">Generated {res['timestamp']} • {res['magazine_count']} curated articles</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -192,7 +226,11 @@ if "pipeline_result" in st.session_state:
     # Article Previews
     # ============================================
 
-    st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:2rem; margin-bottom:1rem;'>📖 Article Previews</h4>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin: 2rem 0 1rem;">
+        // ARTICLE PREVIEWS
+    </div>
+    """, unsafe_allow_html=True)
 
     m_articles = res.get("magazine_articles", [])
     m_reviews = res.get("reviews", [])
@@ -216,7 +254,7 @@ if "pipeline_result" in st.session_state:
             <div class="card-excerpt">{excerpt}</div>
             <div class="card-meta">
                 <span>📖 {read_time} min read</span>
-                {'<span>🔗 <a href="' + display_art.original_link + '" target="_blank" style="color:#4f46e5; text-decoration:none;">Original Source</a></span>' if display_art.original_link else ''}
+                {'<span>🔗 <a href="' + display_art.original_link + '" target="_blank" style="color:#00D4FF; text-decoration:none;">Original Source</a></span>' if display_art.original_link else ''}
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -254,16 +292,20 @@ if "pipeline_result" in st.session_state:
         from utils.issue_tracker import get_issue_history
         history = get_issue_history()
         if history and len(history) > 1:
-            st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:2rem; margin-bottom:1rem;'>📚 Past Issues</h4>", unsafe_allow_html=True)
-            for issue in history[1:5]:  # Show up to 4 past issues (skip current)
+            st.markdown("""
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.15em; margin: 2rem 0 1rem;">
+                // PAST ISSUES
+            </div>
+            """, unsafe_allow_html=True)
+            for issue in history[1:5]:
                 st.markdown(f"""
-                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:0.9rem 1.25rem; margin-bottom:0.5rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="background: #111827; border: 1px solid #1F2937; border-radius: 8px; padding: 12px 18px; margin-bottom: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <span style="font-weight:700; color:#0f172a;">Issue #{issue['issue_number']:03d}</span>
-                            <span style="color:#64748b; font-size:0.85rem; margin-left:12px;">{issue.get('date_display', issue.get('date', ''))}</span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #F1F5F9; font-size: 13px;">Issue #{issue['issue_number']:03d}</span>
+                            <span style="color: #64748B; font-size: 12px; margin-left: 12px; font-family: 'JetBrains Mono', monospace;">{issue.get('date_display', issue.get('date', ''))}</span>
                         </div>
-                        <span style="color:#64748b; font-size:0.85rem;">{issue['article_count']} articles</span>
+                        <span style="color: #64748B; font-size: 12px; font-family: 'JetBrains Mono', monospace;">{issue['article_count']} articles</span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)

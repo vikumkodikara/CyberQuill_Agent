@@ -23,12 +23,16 @@ render_page_header(
 # Project Overview
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🎯 Our Mission</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // OUR MISSION
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
-<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.03); margin-bottom:2rem;">
-    <p style="font-size:1.02rem; color:#334155; line-height:1.65; margin:0;">
-        <b>CyberQuill</b> is an autonomous multi-agent intelligence platform engineered to continuously aggregate, deduplicate, categorize, enrich, write, review, and publish cybersecurity threat magazines.
+<div style="background: #111827; border: 1px solid #1F2937; border-left: 3px solid #00D4FF; border-radius: 0 8px 8px 0; padding: 1.5rem 1.75rem; margin-bottom: 2rem;">
+    <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.65; margin: 0;">
+        <b style="color: #00D4FF;">CyberQuill</b> is an autonomous multi-agent intelligence platform engineered to continuously aggregate, deduplicate, categorize, enrich, write, review, and publish cybersecurity threat magazines.
         Our goal is to make cybersecurity intelligence accessible, readable, and actionable for security professionals, researchers, and technology enthusiasts.
     </p>
 </div>
@@ -38,30 +42,36 @@ st.markdown("""
 # Architecture Topology
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🏗️ LangGraph Orchestration Topology</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // LANGGRAPH ORCHESTRATION TOPOLOGY
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
-<div style="background:#0f172a; border-radius:16px; padding:1.5rem; color:#38bdf8; font-family:'Courier New', monospace; font-size:0.88rem; overflow-x:auto; border:1px solid #1e293b; box-shadow:0 10px 25px rgba(0,0,0,0.2); margin-bottom:2rem;">
+<div style="background: #030712; border-radius: 8px; padding: 1.5rem; color: #00D4FF; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; overflow-x: auto; border: 1px solid #1F2937; margin-bottom: 2rem; line-height: 1.6;">
+<pre style="margin: 0; color: #00D4FF;">
                     ┌────────────────────────────────────────────────────────┐
-                    │            LangGraph StateGraph Pipeline               │
+                    │            <span style="color: #F1F5F9;">LangGraph StateGraph Pipeline</span>               │
                     │                                                        │
-  RSS Feeds ──────▶ │  1. Collector ──▶ 2. Duplicate ──▶ 3. Classifier      │
+  <span style="color: #34D399;">RSS Feeds</span> ──────▶ │  <span style="color: #FCD34D;">1. Collector</span> ──▶ <span style="color: #A78BFA;">2. Duplicate</span> ──▶ <span style="color: #FF3366;">3. Classifier</span>      │
                     │                                           │            │
                     │                                           ▼            │
-                    │                                     4. RAG Agent       │
+                    │                                     <span style="color: #34D399;">4. RAG Agent</span>       │
                     │                                           │            │
                     │                                           ▼            │
-                    │                      ┌────────── 5. Writer Agent ◄───┐ │
+                    │                      ┌────────── <span style="color: #FCD34D;">5. Writer Agent</span> ◄───┐ │
                     │                      │                           │   │
                     │                      ▼                           │   │
-                    │              6. Reviewer Agent ─── revise? ──────┘   │
+                    │              <span style="color: #FF6B00;">6. Reviewer Agent</span> ─── <span style="color: #64748B;">revise?</span> ──────┘   │
                     │                      │                               │
-                    │            approved  ▼                               │
-                    │              7. PDF Generator                        │
+                    │            <span style="color: #34D399;">approved</span>  ▼                               │
+                    │              <span style="color: #00D4FF;">7. PDF Generator</span>                        │
                     └────────────────────────────────────────────────────────┘
                                            │
                                            ▼
-                                📄 CyberQuill Magazine.pdf
+                                📄 <span style="color: #F1F5F9;">CyberQuill Magazine.pdf</span>
+</pre>
 </div>
 """, unsafe_allow_html=True)
 
@@ -69,28 +79,37 @@ st.markdown("""
 # Agentic AI Design Patterns
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🤖 Implemented Agentic AI Design Patterns</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // AGENTIC AI DESIGN PATTERNS
+</div>
+""", unsafe_allow_html=True)
 
 patterns = {
     "🔧 Tool Use Pattern": {
         "description": "Agents dynamically leverage external tools for live data retrieval and vector store indexing.",
         "where": "Collector (feedparser RSS engine), RAG Agent (ChromaDB vector retriever), Writer Agent (Groq LLM).",
+        "color": "#00D4FF",
     },
     "🔀 Router Pattern": {
         "description": "Conditional routing in the orchestrator pipeline based on execution output and quality thresholds.",
         "where": "LangGraph StateGraph conditional edges determining revision loops or approval branches.",
+        "color": "#A78BFA",
     },
     "📋 Task Decomposition": {
         "description": "Decomposes end-to-end publishing into decoupled, specialized micro-agent tasks.",
         "where": "7 distinct agents with single responsibilities and validated Pydantic contract schemas.",
+        "color": "#FF3366",
     },
     "🔄 Reflection / Self-Critique Pattern": {
         "description": "Output is evaluated by a reviewer agent that triggers automated feedback-driven revision cycles.",
         "where": "Reviewer → Writer reflection loop running up to 2 revision iterations.",
+        "color": "#FCD34D",
     },
     "👔 Orchestrator-Worker Architecture": {
         "description": "Central coordinator manages state transitions while worker agents perform core tasks.",
         "where": "LangGraph StateGraph serving as state coordinator across 6 workers and PDF generator.",
+        "color": "#34D399",
     },
 }
 
@@ -105,7 +124,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Technology Stack
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🛠️ Technology Stack</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // TECHNOLOGY STACK
+</div>
+""", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -149,7 +172,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Monitored RSS Feeds
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📡 Monitored Threat Intelligence Feeds</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #34D399; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // MONITORED THREAT INTELLIGENCE FEEDS
+</div>
+""", unsafe_allow_html=True)
 
 sources = [
     ("The Hacker News", "https://feeds.feedburner.com/TheHackersNews"),
@@ -164,9 +191,9 @@ s_cols = st.columns(2)
 for i, (name, url) in enumerate(sources):
     with s_cols[i % 2]:
         st.markdown(f"""
-        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:0.9rem 1.1rem; margin-bottom:0.75rem;">
-            <div style="font-weight:700; color:#0f172a;">📡 {name}</div>
-            <a href="{url}" target="_blank" style="font-size:0.82rem; color:#4f46e5; text-decoration:none;">{url} ↗</a>
+        <div style="background: #111827; border: 1px solid #1F2937; border-left: 3px solid #34D399; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 8px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #F1F5F9; font-size: 13px;">📡 {name}</div>
+            <a href="{url}" target="_blank" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-decoration: none;">{url} ↗</a>
         </div>
         """, unsafe_allow_html=True)
 
@@ -175,17 +202,21 @@ for i, (name, url) in enumerate(sources):
 # ============================================
 
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📊 System Metrics</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // SYSTEM METRICS
+</div>
+""", unsafe_allow_html=True)
+
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Autonomous Agents", "6")
 col2.metric("Test Coverage", "170+ Tests")
 col3.metric("Monitored Feeds", "6 Sources")
 col4.metric("Knowledge Base", "3 Frameworks")
 
-st.divider()
-st.markdown(
-    "<div style='text-align:center; color:#94a3b8; font-size:0.85rem; font-weight:500;'>"
-    "Generated by CyberQuill"
-    "</div>",
-    unsafe_allow_html=True,
-)
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("""
+<div style="border-top: 1px solid #1F2937; padding-top: 1rem; text-align: center;">
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #374151; letter-spacing: 0.1em;">GENERATED BY CYBERQUILL</span>
+</div>
+""", unsafe_allow_html=True)

@@ -1,12 +1,9 @@
 """
-CyberQuill — RAG Testing Page (Debug Mode Only)
+CyberQuill — RAG Testing Page
 ===================================================
 
 Interactive interface to test the Retrieval-Augmented Generation system.
 Users can query the knowledge base and see retrieved context chunks.
-
-This page is only visible in Debug Mode.
-In Magazine Mode, it redirects to the home page.
 """
 
 import streamlit as st
@@ -34,11 +31,11 @@ try:
         doc_count = collection.count()
         kb_built = True
         st.markdown(f"""
-        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:12px; padding:1rem 1.25rem; display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
-            <div style="font-size:1.5rem;">✅</div>
+        <div style="background: #111827; border: 1px solid #1F2937; border-left: 3px solid #00FF88; border-radius: 0 8px 8px 0; padding: 14px 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+            <span class="pulse-dot"></span>
             <div>
-                <div style="font-weight:700; color:#15803d; font-size:1rem;">Knowledge Base Active</div>
-                <div style="color:#166534; font-size:0.88rem;">ChromaDB collection loaded with <b>{doc_count} security framework chunks</b> indexed.</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #00FF88; text-transform: uppercase; letter-spacing: 0.08em;">KNOWLEDGE BASE ACTIVE</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748B; margin-top: 2px;">{doc_count} security framework chunks indexed</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -63,7 +60,11 @@ if not kb_built:
 # Query Interface
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🔎 Execute RAG Search</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // EXECUTE RAG SEARCH
+</div>
+""", unsafe_allow_html=True)
 
 # Sample query handler
 if "selected_sample" in st.session_state:
@@ -77,7 +78,7 @@ with col_q:
     query = st.text_input(
         "Enter natural language query",
         value=default_query,
-        placeholder="e.g. What is SQL injection? How does ransomware work? MITRE ATT&CK credential dumping...",
+        placeholder="e.g. What is SQL injection? How does ransomware work?",
     )
 
 with col_k:
@@ -97,17 +98,21 @@ if query:
 
         clean_chunks = sanitize_rag_context_chunks(context)
         if clean_chunks:
-            st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:1.5rem; margin-bottom:1rem;'>📄 Retrieved Intelligence Context</h4>", unsafe_allow_html=True)
+            st.markdown("""
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin: 1.5rem 0 1rem;">
+                // RETRIEVED INTELLIGENCE CONTEXT
+            </div>
+            """, unsafe_allow_html=True)
 
             for idx, chunk in enumerate(clean_chunks, 1):
                 chunk_escaped = chunk.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
                 st.markdown(f"""
-                <div style="background:#0f172a; color:#e2e8f0; border-radius:14px; padding:1.25rem 1.5rem; margin-bottom:1rem; line-height:1.65; border:1px solid #334155; box-shadow:0 6px 18px rgba(15,23,42,0.25);">
-                    <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem; border-bottom:1px solid #1e293b; padding-bottom:0.4rem; display:flex; justify-content:space-between; align-items:center;">
-                        <span>MATCH RECORD #{idx}</span>
-                        <span style="background:rgba(14,165,233,0.15); color:#38bdf8; padding:2px 8px; border-radius:10px; font-size:0.7rem;">Verified Context</span>
+                <div class="rag-chunk" style="background: #111827; border-left: 3px solid #00D4FF; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1F2937;">
+                        <span>MATCH #{idx}</span>
+                        <span style="background: #00D4FF15; color: #00D4FF; padding: 2px 8px; border-radius: 4px; font-size: 10px;">VERIFIED</span>
                     </div>
-                    <div style="font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
+                    <div style="font-size: 14px; color: #CBD5E1; line-height: 1.7;">
                         {chunk_escaped}
                     </div>
                 </div>
@@ -115,20 +120,29 @@ if query:
 
         if sources:
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("<h5 style='font-weight:700;'>📎 Cited Framework Sources</h5>", unsafe_allow_html=True)
+            st.markdown("""
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
+                // CITED FRAMEWORK SOURCES
+            </div>
+            """, unsafe_allow_html=True)
             clean_sources = [strip_source_filenames(s) for s in sources]
-            s_html = "".join([f'<span style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; margin-right:8px; margin-bottom:8px;">📘 {s}</span>' for s in set(clean_sources) if s])
+            s_html = "".join([f'<span style="background: #7C3AED15; color: #A78BFA; border: 1px solid #7C3AED33; padding: 4px 12px; border-radius: 4px; font-family: JetBrains Mono, monospace; font-weight: 600; font-size: 11px; display: inline-block; margin-right: 8px; margin-bottom: 8px;">📘 {s}</span>' for s in set(clean_sources) if s])
             st.markdown(f"<div>{s_html}</div>", unsafe_allow_html=True)
     else:
         st.info("No relevant context found for this query.")
 
-st.markdown("<br><hr>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown('<div style="border-top: 1px solid #1F2937; margin: 0.5rem 0 1.5rem;"></div>', unsafe_allow_html=True)
 
 # ============================================
 # Sample Queries
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>💡 Click Sample Queries to Test</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // SAMPLE QUERIES
+</div>
+""", unsafe_allow_html=True)
 
 sample_queries = [
     "What are the OWASP Top 10 vulnerabilities?",

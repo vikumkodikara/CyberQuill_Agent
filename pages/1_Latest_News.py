@@ -7,7 +7,7 @@ Users can view raw articles, filter by source, and trigger a fresh collection.
 """
 
 import streamlit as st
-from utils.theme import render_page_header, render_sidebar_controls
+from utils.theme import render_page_header, render_sidebar_controls, get_category_left_border
 from utils.helpers import format_date_magazine
 
 st.set_page_config(page_title="News Feed — CyberQuill", page_icon="📰", layout="wide")
@@ -19,6 +19,13 @@ render_page_header(
     subtitle="Real-time cybersecurity news collected from curated security publications and intelligence sources.",
     icon="📰"
 )
+
+# LIVE badge
+st.markdown("""
+<div style="margin-top: -20px; margin-bottom: 20px;">
+    <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
+</div>
+""", unsafe_allow_html=True)
 
 # ============================================
 # Collect Articles
@@ -39,7 +46,7 @@ with col_btn:
         st.rerun()
 
 with col_info:
-    st.markdown("<div style='padding-top:6px; color:#64748b; font-size:0.9rem;'>⚡ Articles are cached for 5 minutes. Click <b>Refresh Feeds</b> to force a fresh fetch.</div>", unsafe_allow_html=True)
+    st.markdown('<div style="padding-top:6px; color:#64748B; font-size:0.85rem; font-family: JetBrains Mono, monospace;">⚡ Articles cached for 5 min. Click <b style="color:#00D4FF">Refresh Feeds</b> to force a fresh fetch.</div>', unsafe_allow_html=True)
 
 
 # Fetch
@@ -64,7 +71,7 @@ sources = list({a.source for a in articles})
 
 m1, m2, m3 = st.columns(3)
 m1.metric("Total Collected", len(articles))
-m2.metric("Sources", len(sources))
+m2.metric("Sources Active", len(sources))
 m3.metric("Latest Article", format_date_magazine(articles[0].published) if articles[0].published else "Today")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -73,7 +80,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Filters
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🔎 Filter & Search</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // FILTER & SEARCH
+</div>
+""", unsafe_allow_html=True)
 
 f_col1, f_col2 = st.columns([1, 1])
 
@@ -103,23 +114,30 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Article List
 # ============================================
 
+# Assign a left-border color per source for visual grouping
+source_colors = {}
+color_palette = ["#00D4FF", "#7C3AED", "#FF3366", "#34D399", "#FCD34D", "#FF6B00", "#A78BFA", "#F87171"]
+for i, src in enumerate(sorted(sources)):
+    source_colors[src] = color_palette[i % len(color_palette)]
+
 for article in filtered:
     with st.container():
         pub_date = format_date_magazine(article.published) if article.published else "Recent"
         summary_text = article.summary[:320] + ("..." if len(article.summary) > 320 else "") if article.summary else "No preview summary available."
+        border_color = source_colors.get(article.source, "#1F2937")
 
         st.markdown(f"""
-        <div class="article-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 0.5rem;">
-                <a href="{article.link}" target="_blank" style="font-family:'Space Grotesk', sans-serif; font-size:1.2rem; font-weight:700; color:#0f172a; text-decoration:none;">
+        <div style="background: #111827; border: 1px solid #1F2937; border-left: 3px solid {border_color}; border-radius: 0 8px 8px 0; padding: 18px 20px; margin-bottom: 10px; transition: border-color 0.2s;">
+            <div style="margin-bottom: 8px;">
+                <a href="{article.link}" target="_blank" style="font-size: 15px; font-weight: 600; color: #F1F5F9; text-decoration: none; line-height: 1.4;">
                     {article.title} ↗
                 </a>
             </div>
-            <div style="display:flex; gap:12px; margin-bottom:0.75rem; font-size:0.82rem; color:#64748b; align-items:center;">
-                <span style="background:#f1f5f9; color:#334155; padding:2px 10px; border-radius:12px; font-weight:600;">📡 {article.source}</span>
-                <span>🗓️ {pub_date}</span>
+            <div style="display: flex; gap: 16px; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+                <span style="color: {border_color};">📡 {article.source}</span>
+                <span style="color: #64748B;">🗓️ {pub_date}</span>
             </div>
-            <div style="font-size:0.92rem; color:#475569; line-height:1.55;">
+            <div style="font-size: 13px; color: #94A3B8; line-height: 1.6;">
                 {summary_text}
             </div>
         </div>
