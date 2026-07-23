@@ -19,7 +19,7 @@ CyberQuill uses a **sequential pipeline** of 6 AI agents orchestrated by [LangGr
 | **Writer** | Generates magazine-style articles with full analysis |
 | **Reviewer** | Reviews, critiques, and approves articles for publication |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
