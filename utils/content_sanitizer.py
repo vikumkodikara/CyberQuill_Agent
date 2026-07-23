@@ -110,6 +110,7 @@ def sanitize_text(text: str) -> str:
     if not text:
         return ""
 
+    text = strip_owasp_codes(text)
     text = rewrite_mitre_references(text)
     text = strip_mitre_heading_blocks(text)
     text = clean_rag_separators(text)
@@ -119,6 +120,17 @@ def sanitize_text(text: str) -> str:
     text = collapse_whitespace(text)
 
     return text.strip()
+
+
+def strip_owasp_codes(text: str) -> str:
+    """
+    Strips OWASP codes (e.g., A01:2021, A02:2021) and CWE numbers.
+    """
+    # Remove A01:2021 style codes with optional dashes/colons after them
+    text = re.sub(r"\bA\d{2}:\d{4}\s*[-–—:]?\s*", "", text)
+    # Remove CWE-xxx codes
+    text = re.sub(r"\bCWE-\d+\s*[-–—:]?\s*", "", text, flags=re.IGNORECASE)
+    return text
 
 
 # ============================================
@@ -269,15 +281,41 @@ def clean_markdown_artifacts(text: str) -> str:
     """
     Cleans up residual markdown formatting artifacts.
     """
-    # Remove orphaned heading markers at start of lines
-    text = re.sub(r"^#{1,4}\s*(?=\S)", "", text, flags=re.MULTILINE)
+    # Remove heading markers (#, ##, ###, ####, etc.) from start of lines
+    text = re.sub(r"^#{1,6}\s*", "", text, flags=re.MULTILINE)
 
-    # Remove double-asterisk bold markers (convert to plain text)
-    # Only in contexts where markdown won't be rendered
-    # Keep single asterisks for emphasis
+    # Remove double-asterisk bold markers
     text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
 
     return text
+
+
+def sanitize_rag_context_chunks(context_str: str) -> list[str]:
+    """
+    Splits a joined RAG context string on '---' separators and sanitizes each chunk.
+    Strips markdown heading symbols (#, ##, ###), OWASP codes (A01:2021), MITRE IDs (TA0008),
+    source filenames, and metadata. Returns a list of clean, readable text blocks.
+    """
+    if not context_str:
+        return []
+
+    # Split on --- separators
+    raw_chunks = re.split(r"\n\s*---\s*\n|^\s*---\s*$", context_str, flags=re.MULTILINE)
+
+    cleaned_chunks = []
+    for chunk in raw_chunks:
+        if not chunk or not chunk.strip():
+            continue
+
+        cleaned = sanitize_text(chunk)
+        # Ensure all heading symbols are stripped
+        cleaned = re.sub(r"^#{1,6}\s*", "", cleaned, flags=re.MULTILINE)
+        cleaned = collapse_whitespace(cleaned).strip()
+
+        if cleaned:
+            cleaned_chunks.append(cleaned)
+
+    return cleaned_chunks
 
 
 def collapse_whitespace(text: str) -> str:

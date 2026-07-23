@@ -99,21 +99,31 @@ if query:
             context, sources = "", []
 
     if context:
-        st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:1.5rem; margin-bottom:1rem;'>📄 Retrieved Context Chunks</h4>", unsafe_allow_html=True)
-        
-        st.markdown(f"""
-        <div style="background:#0f172a; color:#e2e8f0; border-radius:14px; padding:1.5rem; font-family:'Plus Jakarta Sans', monospace; line-height:1.65; border:1px solid #334155; box-shadow:0 10px 25px -5px rgba(15,23,42,0.3);">
-            <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; border-bottom:1px solid #1e293b; padding-bottom:0.5rem;">
-                RETRIEVED VECTOR EMBEDDING CONTEXT ({num_results} MATCHES)
-            </div>
-            {context.replace(chr(10), '<br>')}
-        </div>
-        """, unsafe_allow_html=True)
+        from utils.content_sanitizer import sanitize_rag_context_chunks, strip_source_filenames
+
+        clean_chunks = sanitize_rag_context_chunks(context)
+        if clean_chunks:
+            st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:1.5rem; margin-bottom:1rem;'>📄 Retrieved Intelligence Context</h4>", unsafe_allow_html=True)
+
+            for idx, chunk in enumerate(clean_chunks, 1):
+                chunk_escaped = chunk.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
+                st.markdown(f"""
+                <div style="background:#0f172a; color:#e2e8f0; border-radius:14px; padding:1.25rem 1.5rem; margin-bottom:1rem; line-height:1.65; border:1px solid #334155; box-shadow:0 6px 18px rgba(15,23,42,0.25);">
+                    <div style="font-size:0.75rem; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem; border-bottom:1px solid #1e293b; padding-bottom:0.4rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span>MATCH RECORD #{idx}</span>
+                        <span style="background:rgba(14,165,233,0.15); color:#38bdf8; padding:2px 8px; border-radius:10px; font-size:0.7rem;">Verified Context</span>
+                    </div>
+                    <div style="font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
+                        {chunk_escaped}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
         if sources:
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("<h5 style='font-weight:700;'>📎 Cited Framework Sources</h5>", unsafe_allow_html=True)
-            s_html = "".join([f'<span style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; margin-right:8px; margin-bottom:8px;">📘 {s}</span>' for s in set(sources)])
+            clean_sources = [strip_source_filenames(s) for s in sources]
+            s_html = "".join([f'<span style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; margin-right:8px; margin-bottom:8px;">📘 {s}</span>' for s in set(clean_sources) if s])
             st.markdown(f"<div>{s_html}</div>", unsafe_allow_html=True)
     else:
         st.info("No relevant context found for this query.")

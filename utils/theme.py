@@ -490,35 +490,9 @@ def get_category_pill_style(category: str) -> tuple[str, str, str]:
 
 def render_sidebar_controls():
     """
-    Renders Magazine/Debug mode toggle and dark mode toggle in the sidebar.
-    Call this from every page to ensure consistent behaviour.
+    Ensures default session state values without displaying extra sidebar settings.
     """
-    with st.sidebar:
-        st.markdown("---")
-        st.markdown(
-            "<div style='font-size:0.78rem; font-weight:700; color:#64748b; "
-            "text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;'>"
-            "Display Settings</div>",
-            unsafe_allow_html=True,
-        )
-
-        # UI Mode toggle
-        mode = st.toggle(
-            "🔧 Debug Mode",
-            value=st.session_state.get("ui_mode", "magazine") == "debug",
-            key="debug_mode_toggle",
-        )
-        st.session_state["ui_mode"] = "debug" if mode else "magazine"
-
-        # Dark mode toggle
-        dark = st.toggle(
-            "🌙 Dark Mode",
-            value=st.session_state.get("dark_mode", False),
-            key="dark_mode_toggle",
-        )
-        st.session_state["dark_mode"] = dark
-
-        if st.session_state.get("ui_mode") == "debug":
-            st.caption("Debug mode shows RAG internals, agent logs, and pipeline details.")
-        else:
-            st.caption("Magazine mode shows a clean, reader-friendly experience.")
+    if "ui_mode" not in st.session_state:
+        st.session_state["ui_mode"] = "magazine"
+    if "dark_mode" not in st.session_state:
+        st.session_state["dark_mode"] = False
