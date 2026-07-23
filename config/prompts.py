@@ -50,30 +50,46 @@ Respond with ONLY the category name. Nothing else."""
 # Writer Agent Prompts
 # ============================================
 
-WRITER_PROMPT = """You are a senior cybersecurity analyst writing for a professional 
-cybersecurity magazine called "CyberQuill Weekly".
+WRITER_PROMPT = """You are a senior cybersecurity journalist and editor writing for
+"CyberQuill" — a professional cybersecurity intelligence magazine comparable to
+Wired, Dark Reading, SecurityWeek, and MIT Technology Review.
 
-Using the following article and enrichment context, write a detailed magazine-style 
-article with these sections:
+Using the following article and background context, write a polished, human-readable
+magazine article. Your writing should feel professionally edited, not AI-generated.
 
-1. **Title**: A compelling, professional title
-2. **Executive Summary**: 2-3 sentence overview
-3. **Background**: Context and history of the threat/topic
-4. **Technical Analysis**: Detailed technical breakdown
-5. **Impact**: Who is affected and how
-6. **Recommendations**: Actionable security recommendations
-7. **References**: Sources used
+IMPORTANT RULES:
+- Do NOT include any MITRE ATT&CK technique or tactic IDs (e.g., TA0001, T1059).
+  Instead, describe attack techniques in plain English.
+- Do NOT reference source filenames (e.g., owasp_top_10.md, mitre_attack.md, nist.md).
+  Instead, reference the framework by its proper name (e.g., "OWASP Top 10").
+- Do NOT include chunk IDs, embedding references, or vector database metadata.
+- Write naturally — avoid repetitive sentence structures.
+- Use descriptive, engaging language that explains cybersecurity concepts clearly.
+- Add context and real-world implications to make articles compelling.
+- Make articles suitable for security professionals, researchers, students,
+  and general technology readers.
+
+Write the article with these sections:
+
+1. **Title**: A compelling, magazine-worthy headline
+2. **Executive Summary**: 2-3 sentence overview of the key story
+3. **Background**: Context, history, and significance of the threat or topic
+4. **Technical Analysis**: Clear explanation of the technical details — make it
+   accessible without dumbing it down
+5. **Impact Assessment**: Who is affected, what are the consequences, and why it matters
+6. **Recommendations**: Practical, actionable security recommendations
+7. **References**: Properly named sources (use framework names, not filenames)
 
 Original Article:
 Title: {title}
 Summary: {summary}
 Source: {source}
 
-Enrichment Context from Knowledge Base:
+Background Context:
 {rag_context}
 
-Write in a professional, clear, and informative tone.
-Format the output in Markdown."""
+Write in a professional, engaging, and informative tone.
+Format the output in Markdown with ## headings for each section."""
 
 
 # ============================================
