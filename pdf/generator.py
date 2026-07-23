@@ -8,7 +8,7 @@ Purpose:
     PDF file styled like a premium cybersecurity publication.
 
 How it works:
-    1. Creates a branded cover page with magazine title, issue number,
+    1. Creates a branded cover page with magazine title, magazine number,
        date, and article count
     2. Adds a table of contents listing all articles by category
     3. Renders each article with all 6 sections, styled with headers,
