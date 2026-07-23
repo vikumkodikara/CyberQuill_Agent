@@ -2,6 +2,8 @@
 
 **CyberQuill** is a multi-agent cybersecurity intelligence platform that collects cybersecurity news from multiple RSS feeds, removes duplicates, classifies articles, enriches content using Retrieval-Augmented Generation (RAG), generates magazine-style cybersecurity articles, reviews generated content using a reflection agent, and exports the final output as downloadable PDF magazines.
 
+**Live Streamlit Demo:** [CyberQuill Live Demo (Local Deployment)](#) *(Note: Replace `#` with your actual deployment URL if hosted online)*
+
 ## 🏗️ Architecture
 
 ```
@@ -18,6 +20,27 @@ CyberQuill uses a **sequential pipeline** of 6 AI agents orchestrated by [LangGr
 | **RAG** | Enriches articles with context from a cybersecurity knowledge base |
 | **Writer** | Generates magazine-style articles with full analysis |
 | **Reviewer** | Reviews, critiques, and approves articles for publication |
+
+### 🔄 Agent Communication Diagram
+
+```mermaid
+graph TD
+    RSS[RSS Feeds] -->|Raw Articles| Collector
+    Collector -->|Articles List| Duplicate[Duplicate Filter]
+    Duplicate -->|Unique Articles| Classifier
+    Classifier -->|Categorized Articles| RAG[RAG Agent]
+    RAG -->|Enriched Articles| Writer
+    Writer -->|Draft Articles| Reviewer
+    Reviewer -->|Approved| PDF[PDF Generator]
+    Reviewer -->|Rejected| Writer
+```
+
+### 📚 RAG Pipeline Explanation
+
+The **RAG (Retrieval-Augmented Generation) Pipeline** enhances collected cybersecurity news with deep context from verified security frameworks (OWASP Top 10, NIST CSF 2.0, MITRE ATT&CK). 
+1. **Indexing**: Framework PDFs are chunked and embedded using `Sentence-Transformers (all-MiniLM-L6-v2)` into a persistent local `ChromaDB` vector store.
+2. **Retrieval**: When an article is processed, the RAG Agent queries the vector store for conceptually related security chunks based on the article's classification and summary.
+3. **Augmentation**: The retrieved context is injected into the Writer Agent's prompt, ensuring the generated magazine article contains expert-level, framework-aligned analysis instead of generic hallucinations.
 
 ## 🚀 Quick Start
 
@@ -94,6 +117,15 @@ pytest tests/ -v
 
 ## 🛠️ Technology Stack
 
+### Model-Choice Comparison
+
+| Provider | Model | Role | Rationale |
+|----------|-------|------|-----------|
+| **Groq** | `llama-3.3-70b-versatile` | Classifier, Writer, Reviewer | Blazing-fast inference speeds necessary for processing multiple articles per issue without timeouts. High instruction-following capability for structured JSON output and drafting. |
+| **OpenRouter** | `meta-llama/llama-4-maverick` | Fallback / Complex Reasoning | Specialized model configured for tackling complex reasoning tasks and deeply nuanced cybersecurity topics when standard fast models fall short. |
+
+### Technologies
+
 - **Framework**: Streamlit, LangGraph
 - **LLM Providers**: Groq, OpenRouter
 - **Vector Store**: ChromaDB
@@ -108,3 +140,10 @@ This project is for academic purposes.
 ## 👤 Author
 
 Vikum Kodikara
+
+## ⚠️ Known Limitations
+
+- **Processing Time**: The pipeline can take several minutes to run entirely depending on the number of articles collected and API rate limits.
+- **Dependency on RSS Feeds**: If the source feeds go down or change their XML structure, the collector may fail to parse new articles.
+- **API Rate Limits**: Aggressive fetching and writing can hit rate limits on free tiers of Groq or OpenRouter.
+- **RAG Context Size**: The context window limits how much of the framework PDF content can be injected at once, occasionally resulting in truncated references.
