@@ -1,5 +1,5 @@
 {
-  "next_issue": 75,
+  "next_issue": 87,
   "issues": [
     {
       "issue_number": 1,
@@ -765,6 +765,128 @@
         "Threat Intelligence": 8,
         "AI Security": 14,
         "Cloud Security": 4
+      }
+    },
+    {
+      "issue_number": 75,
+      "date": "2026-07-24 03:21:12",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_generates_pdf_file0\\test_output.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 76,
+      "date": "2026-07-24 03:21:12",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_pdf_file_not_empty0\\test_size.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 77,
+      "date": "2026-07-24 03:21:12",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_pdf_starts_with_magic_byt0\\test_magic.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 78,
+      "date": "2026-07-24 03:21:12",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_custom_filename0\\my_magazine.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 79,
+      "date": "2026-07-24 03:21:12",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_default_filename_has_time0\\cyberquill_issue079_20260724_032112.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 80,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 3,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_multiple_articles0\\test_multi.pdf",
+      "categories": {
+        "Malware": 1,
+        "Data Breach": 1,
+        "Zero-Day": 1
+      }
+    },
+    {
+      "issue_number": 81,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_minimal_article_pdf0\\test_minimal.pdf",
+      "categories": {
+        "Test": 1
+      }
+    },
+    {
+      "issue_number": 82,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_article_with_special_char0\\test_special.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 83,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_single_article_pdf0\\test_single.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 84,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_article_with_empty_sectio0\\test_empty.pdf",
+      "categories": {
+        "Uncategorized": 1
+      }
+    },
+    {
+      "issue_number": 85,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_returns_absolute_path0\\test_abs.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 86,
+      "date": "2026-07-24 03:21:13",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-10\\test_output_directory_created0\\nested\\output\\test_nested.pdf",
+      "categories": {
+        "Malware": 1
       }
     }
   ]
