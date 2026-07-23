@@ -361,14 +361,14 @@ with c4:
                 <div class="nav-card-icon" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #9333ea;">📄</div>
                 <span class="nav-card-tag" style="background:#faf5ff; color:#7e22ce; border-color:#d8b4fe;">PUBLISH</span>
             </div>
-            <div class="nav-card-title">Publish New Issue</div>
+            <div class="nav-card-title">Generate a Magazine</div>
             <div class="nav-card-desc">
                 Generate a new magazine issue — curated articles are enriched, professionally written, reviewed, and compiled into a downloadable PDF.
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    st.page_link("pages/4_Generate_Magazine.py", label="Publish Issue →", icon="📄", use_container_width=True)
+    st.page_link("pages/4_Generate_Magazine.py", label="Generate Magazine →", icon="📄", use_container_width=True)
 
 with c5:
     st.markdown("""

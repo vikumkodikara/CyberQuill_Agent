@@ -552,7 +552,8 @@ def _build_cover(
         )
     )
 
-    # Push to next page
+    # Switch to content template and push to next page
+    elements.append(NextPageTemplate("content"))
     elements.append(PageBreak())
 
     return elements
@@ -809,10 +810,7 @@ def generate_pdf(
     # Cover page (uses "cover" template — the first template is used by default)
     elements.extend(_build_cover(sanitized_articles, styles, _current_issue_number))
 
-    # Switch to content template for remaining pages
-    elements.append(NextPageTemplate("content"))
-
-    # Table of contents
+    # Table of contents (template already switched inside _build_cover)
     elements.extend(_build_toc(sanitized_articles, styles))
 
     # Each article

@@ -79,7 +79,7 @@ with col_agent:
 
 if not LOG_FILE.exists():
     st.info(
-        "📭 No log stream detected. Run the pipeline from **Publish Issue** page to generate real-time logs.\n\n"
+        "📭 No log stream detected. Run the pipeline from **Generate Magazine** page to generate real-time logs.\n\n"
         f"Target log path: `{LOG_FILE.resolve()}`"
     )
     st.stop()

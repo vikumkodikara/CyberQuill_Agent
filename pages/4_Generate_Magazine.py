@@ -13,14 +13,14 @@ from utils.theme import render_page_header, get_category_badge_html, render_side
 from utils.helpers import estimate_article_reading_time
 from utils.content_sanitizer import sanitize_article
 
-st.set_page_config(page_title="Publish Issue — CyberQuill", page_icon="📰", layout="wide")
+st.set_page_config(page_title="Generate Magazine — CyberQuill", page_icon="📰", layout="wide")
 
 # Sidebar controls
 render_sidebar_controls()
 
 render_page_header(
-    title="Publish New Issue",
-    subtitle="Generate a new CyberQuill magazine issue — articles are curated, enriched, professionally written, reviewed, and compiled into a downloadable PDF.",
+    title="Generate a Magazine",
+    subtitle="Create a new CyberQuill magazine — articles are curated, enriched, professionally written, reviewed, and compiled into a downloadable PDF.",
     icon="📰"
 )
 
@@ -28,7 +28,7 @@ render_page_header(
 # Pipeline Controls
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🚀 Publish Magazine Issue</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🚀 Generate Magazine</h4>", unsafe_allow_html=True)
 
 col_run, col_opts = st.columns([1, 2])
 
@@ -42,7 +42,7 @@ with col_opts:
 
 with col_run:
     run_clicked = st.button(
-        "📰 Publish New Issue",
+        "📰 Generate Magazine",
         type="primary",
         use_container_width=True,
     )
