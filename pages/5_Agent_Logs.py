@@ -1,16 +1,26 @@
 """
-CyberQuill — Agent Logs Page
-===============================
+CyberQuill — Agent Logs Page (Debug Mode Only)
+=================================================
 
 Displays the structured log file from the CyberQuill pipeline.
 Allows filtering by log level and agent name with auto-refresh.
+
+This page is only visible in Debug Mode.
 """
 
 import streamlit as st
 from pathlib import Path
-from utils.theme import render_page_header
+from utils.theme import render_page_header, render_sidebar_controls
+from utils.helpers import is_magazine_mode
 
 st.set_page_config(page_title="Agent Logs — CyberQuill", page_icon="📋", layout="wide")
+
+render_sidebar_controls()
+
+# Gate: Debug Mode only
+if is_magazine_mode():
+    st.info("🔒 This page is available in **Debug Mode** only. Enable Debug Mode from the sidebar toggle.")
+    st.stop()
 
 render_page_header(
     title="Agent Observability & Logs",
@@ -52,7 +62,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Filters
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>🔎 Filter Telemetry</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🔎 Filter Telemetry</h4>", unsafe_allow_html=True)
 
 col_level, col_agent = st.columns(2)
 
@@ -75,7 +85,7 @@ with col_agent:
 
 if not LOG_FILE.exists():
     st.info(
-        "📭 No log stream detected. Run the pipeline from **Generate Magazine** page to generate real-time logs.\n\n"
+        "📭 No log stream detected. Run the pipeline from **Publish Issue** page to generate real-time logs.\n\n"
         f"Target log path: `{LOG_FILE.resolve()}`"
     )
     st.stop()
@@ -136,7 +146,7 @@ st.markdown(
 # ============================================
 
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>📊 Telemetry Statistics</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📊 Telemetry Statistics</h4>", unsafe_allow_html=True)
 
 level_counts = {"DEBUG": 0, "INFO": 0, "WARNING": 0, "ERROR": 0}
 for line in lines:

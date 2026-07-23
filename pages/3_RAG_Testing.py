@@ -1,15 +1,26 @@
 """
-CyberQuill — RAG Testing Page
-================================
+CyberQuill — RAG Testing Page (Debug Mode Only)
+===================================================
 
 Interactive interface to test the Retrieval-Augmented Generation system.
 Users can query the knowledge base and see retrieved context chunks.
+
+This page is only visible in Debug Mode.
+In Magazine Mode, it redirects to the home page.
 """
 
 import streamlit as st
-from utils.theme import render_page_header
+from utils.theme import render_page_header, render_sidebar_controls
+from utils.helpers import is_magazine_mode
 
 st.set_page_config(page_title="RAG Testing — CyberQuill", page_icon="📚", layout="wide")
+
+render_sidebar_controls()
+
+# Gate: Debug Mode only
+if is_magazine_mode():
+    st.info("🔒 This page is available in **Debug Mode** only. Enable Debug Mode from the sidebar toggle.")
+    st.stop()
 
 render_page_header(
     title="RAG Vector Search Playground",
@@ -58,7 +69,7 @@ if not kb_built:
 # Query Interface
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>🔎 Execute RAG Search</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🔎 Execute RAG Search</h4>", unsafe_allow_html=True)
 
 # Sample query handler
 if "selected_sample" in st.session_state:
@@ -88,7 +99,7 @@ if query:
             context, sources = "", []
 
     if context:
-        st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-top:1.5rem; margin-bottom:1rem;'>📄 Retrieved Context Chunks</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:1.5rem; margin-bottom:1rem;'>📄 Retrieved Context Chunks</h4>", unsafe_allow_html=True)
         
         st.markdown(f"""
         <div style="background:#0f172a; color:#e2e8f0; border-radius:14px; padding:1.5rem; font-family:'Plus Jakarta Sans', monospace; line-height:1.65; border:1px solid #334155; box-shadow:0 10px 25px -5px rgba(15,23,42,0.3);">
@@ -101,7 +112,7 @@ if query:
 
         if sources:
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("<h5 style='font-weight:700; color:#0f172a;'>📎 Cited Framework Sources</h5>", unsafe_allow_html=True)
+            st.markdown("<h5 style='font-weight:700;'>📎 Cited Framework Sources</h5>", unsafe_allow_html=True)
             s_html = "".join([f'<span style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; margin-right:8px; margin-bottom:8px;">📘 {s}</span>' for s in set(sources)])
             st.markdown(f"<div>{s_html}</div>", unsafe_allow_html=True)
     else:
@@ -113,7 +124,7 @@ st.markdown("<br><hr>", unsafe_allow_html=True)
 # Sample Queries
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>💡 Click Sample Queries to Test</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>💡 Click Sample Queries to Test</h4>", unsafe_allow_html=True)
 
 sample_queries = [
     "What are the OWASP Top 10 vulnerabilities?",
