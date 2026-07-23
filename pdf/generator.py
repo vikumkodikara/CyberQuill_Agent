@@ -8,7 +8,7 @@ Purpose:
     PDF file styled like a premium cybersecurity publication.
 
 How it works:
-    1. Creates a branded cover page with magazine title, issue number,
+    1. Creates a branded cover page with magazine title, magazine number,
        date, and article count
     2. Adds a table of contents listing all articles by category
     3. Renders each article with all 6 sections, styled with headers,
@@ -552,7 +552,8 @@ def _build_cover(
         )
     )
 
-    # Push to next page
+    # Switch to content template and push to next page
+    elements.append(NextPageTemplate("content"))
     elements.append(PageBreak())
 
     return elements
@@ -809,10 +810,7 @@ def generate_pdf(
     # Cover page (uses "cover" template — the first template is used by default)
     elements.extend(_build_cover(sanitized_articles, styles, _current_issue_number))
 
-    # Switch to content template for remaining pages
-    elements.append(NextPageTemplate("content"))
-
-    # Table of contents
+    # Table of contents (template already switched inside _build_cover)
     elements.extend(_build_toc(sanitized_articles, styles))
 
     # Each article

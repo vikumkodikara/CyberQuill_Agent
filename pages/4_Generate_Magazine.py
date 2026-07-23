@@ -4,67 +4,74 @@ CyberQuill — Generate Magazine Page
 
 Runs the full pipeline and generates a downloadable PDF magazine.
 Shows progress for each pipeline stage with reader-friendly status updates.
-Supports Magazine Mode (clean display) and Debug Mode (full metrics).
 """
 
 import streamlit as st
 from pathlib import Path
 from datetime import datetime
 from utils.theme import render_page_header, get_category_badge_html, render_sidebar_controls, get_category_pill_style
-from utils.helpers import is_magazine_mode, is_debug_mode, estimate_article_reading_time
+from utils.helpers import estimate_article_reading_time
 from utils.content_sanitizer import sanitize_article
 
-st.set_page_config(page_title="Publish Issue — CyberQuill", page_icon="📰", layout="wide")
+st.set_page_config(page_title="Generate Magazine — CyberQuill", page_icon="📰", layout="wide")
 
 # Sidebar controls
 render_sidebar_controls()
 
-magazine_mode = is_magazine_mode()
-
-if magazine_mode:
-    render_page_header(
-        title="Publish New Issue",
-        subtitle="Generate a new CyberQuill magazine issue — articles are curated, enriched, professionally written, and compiled into a downloadable PDF.",
-        icon="📰"
-    )
-else:
-    render_page_header(
-        title="Generate CyberQuill Issue",
-        subtitle="Execute the autonomous 7-agent pipeline to aggregate, deduplicate, classify, enrich, write, review, and render a PDF issue.",
-        icon="📰"
-    )
+render_page_header(
+    title="Generate a Magazine",
+    subtitle="Create a new CyberQuill magazine — articles are curated, enriched, professionally written, reviewed, and compiled into a downloadable PDF.",
+    icon="📰"
+)
 
 # ============================================
-# Pipeline Controls
+# Pipeline Preview (7 agents)
 # ============================================
 
-if magazine_mode:
-    st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🚀 Publish</h4>", unsafe_allow_html=True)
-else:
-    st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🚀 Pipeline Orchestration Controls</h4>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+    // PIPELINE AGENTS
+</div>
+""", unsafe_allow_html=True)
+
+agent_cols = st.columns(7)
+agents = [
+    ("📡", "Collect", "#00D4FF"),
+    ("🔍", "Dedup", "#A78BFA"),
+    ("🏷️", "Classify", "#FF3366"),
+    ("📚", "RAG", "#34D399"),
+    ("✍️", "Write", "#FCD34D"),
+    ("📝", "Review", "#FF6B00"),
+    ("📄", "PDF", "#00D4FF"),
+]
+for i, (icon, name, color) in enumerate(agents):
+    with agent_cols[i]:
+        st.markdown(f"""
+        <div style="background: #111827; border: 1px solid #1F2937; border-top: 2px solid {color}; border-radius: 8px; padding: 12px 6px; text-align: center;">
+            <div style="font-size: 1.4rem;">{icon}</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: #F1F5F9; margin-top: 4px;">{name}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ============================================
+# Generate Controls
+# ============================================
 
 col_run, col_opts = st.columns([1, 2])
 
 with col_opts:
-    if magazine_mode:
-        st.markdown("""
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1rem 1.25rem;">
-            <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">How it works</div>
-            <div style="font-size:0.85rem; color:#64748b;">CyberQuill gathers the latest cybersecurity news, enriches it with expert context, and compiles a professionally written magazine PDF.</div>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1rem 1.25rem;">
-            <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">Execution Mode</div>
-            <div style="font-size:0.85rem; color:#64748b;">LangGraph orchestrator will trigger Collector → Duplicate → Classifier → RAG → Writer → Reviewer → PDF Generator.</div>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("""
+    <div style="background: #111827; border: 1px solid #1F2937; border-radius: 8px; padding: 16px 20px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">// HOW IT WORKS</div>
+        <div style="font-size: 13px; color: #94A3B8; line-height: 1.6;">CyberQuill gathers the latest cybersecurity news, enriches it with expert context from OWASP/NIST/MITRE frameworks, and compiles a professionally written magazine PDF.</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col_run:
-    btn_label = "📰 Publish New Issue" if magazine_mode else "▶️ Launch Full Pipeline"
     run_clicked = st.button(
-        btn_label,
+        "◈ GENERATE MAGAZINE",
         type="primary",
         use_container_width=True,
     )
@@ -77,36 +84,22 @@ if run_clicked:
     progress_bar = st.progress(0, text="Preparing...")
     status_box = st.container()
 
-    if magazine_mode:
-        stages = [
-            ("📡 Gathering latest cybersecurity news...", 0.14),
-            ("🔍 Filtering duplicate stories...", 0.28),
-            ("🏷️ Categorizing threat intelligence...", 0.42),
-            ("📚 Enriching with security context...", 0.56),
-            ("✍️ Composing magazine articles...", 0.70),
-            ("📝 Editorial quality review...", 0.85),
-            ("📄 Preparing magazine layout...", 0.95),
-        ]
-    else:
-        stages = [
-            ("📡 Stage 1: Collecting articles from RSS feeds...", 0.14),
-            ("🔍 Stage 2: Deduplicating articles via fuzzy matching...", 0.28),
-            ("🏷️ Stage 3: Classifying threat categories...", 0.42),
-            ("📚 Stage 4: Enriching with RAG vector search...", 0.56),
-            ("✍️ Stage 5: Generating executive article summaries...", 0.70),
-            ("📝 Stage 6: Running Reviewer Agent quality reflection loop...", 0.85),
-            ("📄 Stage 7: Compiling PDF magazine layout...", 0.95),
-        ]
+    stages = [
+        ("📡 Gathering latest cybersecurity news...", 0.14),
+        ("🔍 Filtering duplicate stories...", 0.28),
+        ("🏷️ Categorizing threat intelligence...", 0.42),
+        ("📚 Enriching with security context...", 0.56),
+        ("✍️ Composing magazine articles...", 0.70),
+        ("📝 Editorial quality review...", 0.85),
+        ("📄 Preparing magazine layout...", 0.95),
+    ]
 
     try:
         # Stage 1: Collect
         progress_bar.progress(stages[0][1], text=stages[0][0])
         from agents.collector import collect_all_feeds
         raw_articles = collect_all_feeds()
-        if magazine_mode:
-            status_box.success(f"📡 Collected {len(raw_articles)} news articles")
-        else:
-            status_box.success(f"📡 Stage 1 Complete: Collected {len(raw_articles)} raw threat feeds")
+        status_box.success(f"📡 Collected {len(raw_articles)} news articles")
 
         if not raw_articles:
             st.error("No articles collected. Feeds unavailable.")
@@ -116,10 +109,7 @@ if run_clicked:
         progress_bar.progress(stages[1][1], text=stages[1][0])
         from agents.duplicate import remove_duplicates
         unique_articles = remove_duplicates(raw_articles)
-        if magazine_mode:
-            status_box.success(f"🔍 Filtered to {len(unique_articles)} unique stories")
-        else:
-            status_box.success(f"🔍 Stage 2 Complete: Filtered duplicates ({len(raw_articles)} → {len(unique_articles)} unique)")
+        status_box.success(f"🔍 Filtered to {len(unique_articles)} unique stories")
 
         # Stage 3: Classify
         progress_bar.progress(stages[2][1], text=stages[2][0])
@@ -128,10 +118,7 @@ if run_clicked:
         cats = {}
         for a in classified:
             cats[a.category] = cats.get(a.category, 0) + 1
-        if magazine_mode:
-            status_box.success(f"🏷️ Categorized {len(classified)} articles")
-        else:
-            status_box.success(f"🏷️ Stage 3 Complete: Classified {len(classified)} articles into categories")
+        status_box.success(f"🏷️ Categorized {len(classified)} articles")
 
         # Stage 4: RAG Enrich
         progress_bar.progress(stages[3][1], text=stages[3][0])
@@ -142,19 +129,13 @@ if run_clicked:
         except Exception:
             build_knowledge_base()
         enriched = enrich_articles(classified)
-        if magazine_mode:
-            status_box.success(f"📚 Enriched {len(enriched)} articles with expert context")
-        else:
-            status_box.success(f"📚 Stage 4 Complete: Enriched {len(enriched)} articles with vector context")
+        status_box.success(f"📚 Enriched {len(enriched)} articles with expert context")
 
         # Stage 5: Write
         progress_bar.progress(stages[4][1], text=stages[4][0])
         from agents.writer import write_articles
         magazine_articles = write_articles(enriched)
-        if magazine_mode:
-            status_box.success(f"✍️ Composed {len(magazine_articles)} magazine articles")
-        else:
-            status_box.success(f"✍️ Stage 5 Complete: Generated {len(magazine_articles)} magazine articles")
+        status_box.success(f"✍️ Composed {len(magazine_articles)} magazine articles")
 
         # Stage 6: Review
         progress_bar.progress(stages[5][1], text=stages[5][0])
@@ -162,10 +143,7 @@ if run_clicked:
         reviews = review_articles(magazine_articles)
         approved = sum(1 for r in reviews if r.approved)
         avg_score = sum(r.quality_score for r in reviews) / len(reviews) if reviews else 0
-        if magazine_mode:
-            status_box.success(f"📝 Quality review passed — {approved} articles approved")
-        else:
-            status_box.success(f"📝 Stage 6 Complete: Quality Review Passed ({approved}/{len(reviews)} approved, score {avg_score:.1f}/10)")
+        status_box.success(f"📝 Quality review passed — {approved} articles approved")
 
         # Stage 7: PDF
         progress_bar.progress(stages[6][1], text=stages[6][0])
@@ -173,11 +151,8 @@ if run_clicked:
         from utils.issue_tracker import get_current_issue_number
         issue_num = get_current_issue_number()
         pdf_path = generate_pdf(magazine_articles)
-        progress_bar.progress(1.0, text="✅ Issue Published Successfully!")
-        if magazine_mode:
-            status_box.success(f"📄 Magazine issue ready for download!")
-        else:
-            status_box.success(f"📄 Stage 7 Complete: PDF issue saved to {pdf_path}")
+        progress_bar.progress(1.0, text="✅ Magazine Generated Successfully!")
+        status_box.success(f"📄 Magazine ready for download!")
 
         # Store in session state
         st.session_state["pipeline_result"] = {
@@ -209,21 +184,18 @@ if run_clicked:
 if "pipeline_result" in st.session_state:
     res = st.session_state["pipeline_result"]
 
-    st.markdown("<br><hr>", unsafe_allow_html=True)
+    st.markdown('<div style="border-top: 1px solid #1F2937; margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
-    if magazine_mode:
-        st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📊 Issue Summary</h4>", unsafe_allow_html=True)
-        m1, m2, m3 = st.columns(3)
-        m1.metric("News Sources", res["raw_count"])
-        m2.metric("Unique Stories", res["unique_count"])
-        m3.metric("Published Articles", res["magazine_count"])
-    else:
-        st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📊 Pipeline Execution Summary</h4>", unsafe_allow_html=True)
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Raw Feeds", res["raw_count"])
-        m2.metric("Unique Signals", res["unique_count"])
-        m3.metric("Approved Articles", f"{res['approved_count']}/{res['magazine_count']}")
-        m4.metric("Avg Quality Score", f"{res['avg_score']:.1f} / 10")
+    st.markdown("""
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+        // ISSUE SUMMARY
+    </div>
+    """, unsafe_allow_html=True)
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("News Sources", res["raw_count"])
+    m2.metric("Unique Stories", res["unique_count"])
+    m3.metric("Published Articles", res["magazine_count"])
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -233,10 +205,10 @@ if "pipeline_result" in st.session_state:
         if p_path.exists():
             issue_num = res.get("issue_number", "—")
             st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color:white; padding:2rem; border-radius:18px; border:1px solid #6366f1; text-align:center; box-shadow:0 15px 30px rgba(15,23,42,0.3); margin-bottom:2rem;">
-                <div style="font-size:2rem; margin-bottom:0.5rem;">📄</div>
-                <h3 style="font-family:'Space Grotesk', sans-serif; margin:0 0 0.5rem 0; color:#ffffff;">CyberQuill Issue #{issue_num:03d} is Ready!</h3>
-                <p style="color:#94a3b8; font-size:0.95rem; margin-bottom:1.5rem;">Published {res['timestamp']} with {res['magazine_count']} curated articles.</p>
+            <div style="background: linear-gradient(135deg, #0D1117 0%, #1a1040 100%); color: white; padding: 2rem; border-radius: 12px; border: 1px solid #7C3AED33; text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+                <h3 style="font-family: 'JetBrains Mono', monospace; margin: 0 0 0.5rem 0; color: #00D4FF; font-size: 18px; letter-spacing: 0.08em;">CYBERQUILL ISSUE #{issue_num:03d} READY</h3>
+                <p style="color: #64748B; font-size: 13px; font-family: 'JetBrains Mono', monospace; margin-bottom: 1.5rem;">Generated {res['timestamp']} • {res['magazine_count']} curated articles</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -254,7 +226,11 @@ if "pipeline_result" in st.session_state:
     # Article Previews
     # ============================================
 
-    st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:2rem; margin-bottom:1rem;'>📖 Article Previews</h4>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin: 2rem 0 1rem;">
+        // ARTICLE PREVIEWS
+    </div>
+    """, unsafe_allow_html=True)
 
     m_articles = res.get("magazine_articles", [])
     m_reviews = res.get("reviews", [])
@@ -262,8 +238,7 @@ if "pipeline_result" in st.session_state:
     for i, art in enumerate(m_articles):
         rev = m_reviews[i] if i < len(m_reviews) else None
 
-        # Sanitize for display in magazine mode
-        display_art = sanitize_article(art) if magazine_mode else art
+        display_art = sanitize_article(art)
 
         read_time = estimate_article_reading_time(display_art)
         bg, fg, border = get_category_pill_style(display_art.category)
@@ -272,58 +247,42 @@ if "pipeline_result" in st.session_state:
         if len(display_art.executive_summary or "") > 300:
             excerpt += "..."
 
-        if magazine_mode:
-            # Magazine-style preview cards
-            st.markdown(f"""
-            <div class="magazine-preview-card">
-                <span class="card-category" style="background:{bg}; color:{fg}; border:1px solid {border};">{display_art.category}</span>
-                <div class="card-title">{display_art.title}</div>
-                <div class="card-excerpt">{excerpt}</div>
-                <div class="card-meta">
-                    <span>📖 {read_time} min read</span>
-                    {'<span>🔗 <a href="' + display_art.original_link + '" target="_blank" style="color:#4f46e5; text-decoration:none;">Original Source</a></span>' if display_art.original_link else ''}
-                </div>
+        st.markdown(f"""
+        <div class="magazine-preview-card">
+            <span class="card-category" style="background:{bg}; color:{fg}; border:1px solid {border};">{display_art.category}</span>
+            <div class="card-title">{display_art.title}</div>
+            <div class="card-excerpt">{excerpt}</div>
+            <div class="card-meta">
+                <span>📖 {read_time} min read</span>
+                {'<span>🔗 <a href="' + display_art.original_link + '" target="_blank" style="color:#00D4FF; text-decoration:none;">Original Source</a></span>' if display_art.original_link else ''}
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
-            # Expandable full article view
-            with st.expander(f"📖 Read Full Article: {display_art.title}"):
-                if display_art.executive_summary:
-                    st.markdown("### Executive Summary")
-                    st.markdown(display_art.executive_summary)
-                if display_art.background:
-                    st.markdown("---")
-                    st.markdown("### Background")
-                    st.markdown(display_art.background)
-                if display_art.technical_analysis:
-                    st.markdown("---")
-                    st.markdown("### Technical Analysis")
-                    st.markdown(display_art.technical_analysis)
-                if display_art.impact:
-                    st.markdown("---")
-                    st.markdown("### Impact Assessment")
-                    st.markdown(display_art.impact)
-                if display_art.recommendations:
-                    st.markdown("---")
-                    st.markdown("### Recommendations")
-                    st.markdown(display_art.recommendations)
-                if display_art.references:
-                    st.markdown("---")
-                    st.markdown("### References")
-                    st.markdown(display_art.references)
-        else:
-            # Debug mode: expanders with scores
-            status_icon = "✅" if (rev and rev.approved) else "⚠️"
-            score_val = rev.quality_score if rev else "N/A"
-
-            with st.expander(f"{status_icon} {art.title} (Score: {score_val}/10)"):
-                st.markdown(f"**Category:** `{art.category}`")
-                if art.executive_summary:
-                    st.markdown(f"**Executive Summary:** {art.executive_summary}")
-                if art.original_link:
-                    st.markdown(f"🔗 [View Original Article]({art.original_link})")
-                if rev and rev.issues:
-                    st.warning("Quality Review Feedback: " + ", ".join(rev.issues))
+        with st.expander(f"📖 Read Full Article: {display_art.title}"):
+            if display_art.executive_summary:
+                st.markdown("### Executive Summary")
+                st.markdown(display_art.executive_summary)
+            if display_art.background:
+                st.markdown("---")
+                st.markdown("### Background")
+                st.markdown(display_art.background)
+            if display_art.technical_analysis:
+                st.markdown("---")
+                st.markdown("### Technical Analysis")
+                st.markdown(display_art.technical_analysis)
+            if display_art.impact:
+                st.markdown("---")
+                st.markdown("### Impact Assessment")
+                st.markdown(display_art.impact)
+            if display_art.recommendations:
+                st.markdown("---")
+                st.markdown("### Recommendations")
+                st.markdown(display_art.recommendations)
+            if display_art.references:
+                st.markdown("---")
+                st.markdown("### References")
+                st.markdown(display_art.references)
 
     # ============================================
     # Issue History
@@ -333,16 +292,20 @@ if "pipeline_result" in st.session_state:
         from utils.issue_tracker import get_issue_history
         history = get_issue_history()
         if history and len(history) > 1:
-            st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:2rem; margin-bottom:1rem;'>📚 Past Issues</h4>", unsafe_allow_html=True)
-            for issue in history[1:5]:  # Show up to 4 past issues (skip current)
+            st.markdown("""
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.15em; margin: 2rem 0 1rem;">
+                // PAST ISSUES
+            </div>
+            """, unsafe_allow_html=True)
+            for issue in history[1:5]:
                 st.markdown(f"""
-                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:0.9rem 1.25rem; margin-bottom:0.5rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="background: #111827; border: 1px solid #1F2937; border-radius: 8px; padding: 12px 18px; margin-bottom: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <span style="font-weight:700; color:#0f172a;">Issue #{issue['issue_number']:03d}</span>
-                            <span style="color:#64748b; font-size:0.85rem; margin-left:12px;">{issue.get('date_display', issue.get('date', ''))}</span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #F1F5F9; font-size: 13px;">Issue #{issue['issue_number']:03d}</span>
+                            <span style="color: #64748B; font-size: 12px; margin-left: 12px; font-family: 'JetBrains Mono', monospace;">{issue.get('date_display', issue.get('date', ''))}</span>
                         </div>
-                        <span style="color:#64748b; font-size:0.85rem;">{issue['article_count']} articles</span>
+                        <span style="color: #64748B; font-size: 12px; font-family: 'JetBrains Mono', monospace;">{issue['article_count']} articles</span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
