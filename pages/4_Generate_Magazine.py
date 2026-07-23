@@ -19,20 +19,11 @@ st.set_page_config(page_title="Publish Issue — CyberQuill", page_icon="📰", 
 # Sidebar controls
 render_sidebar_controls()
 
-magazine_mode = is_magazine_mode()
-
-if magazine_mode:
-    render_page_header(
-        title="Publish New Issue",
-        subtitle="Generate a new CyberQuill magazine issue — articles are curated, enriched, professionally written, and compiled into a downloadable PDF.",
-        icon="📰"
-    )
-else:
-    render_page_header(
-        title="Generate CyberQuill Issue",
-        subtitle="Execute the autonomous 7-agent pipeline to aggregate, deduplicate, classify, enrich, write, review, and render a PDF issue.",
-        icon="📰"
-    )
+render_page_header(
+    title="Publish New Issue",
+    subtitle="Generate a new CyberQuill magazine issue — articles are curated, enriched, professionally written, reviewed, and compiled into a downloadable PDF.",
+    icon="📰"
+)
 
 # ============================================
 # Pipeline Controls

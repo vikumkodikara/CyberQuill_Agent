@@ -17,11 +17,6 @@ st.set_page_config(page_title="Agent Logs — CyberQuill", page_icon="📋", lay
 
 render_sidebar_controls()
 
-# Gate: Debug Mode only
-if is_magazine_mode():
-    st.info("🔒 This page is available in **Debug Mode** only. Enable Debug Mode from the sidebar toggle.")
-    st.stop()
-
 render_page_header(
     title="Agent Observability & Logs",
     subtitle="Monitor real-time pipeline execution, agent state transitions, and structured debug telemetry.",

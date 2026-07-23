@@ -16,20 +16,11 @@ st.set_page_config(page_title="Topics — CyberQuill", page_icon="🏷️", layo
 
 render_sidebar_controls()
 
-magazine_mode = is_magazine_mode()
-
-if magazine_mode:
-    render_page_header(
-        title="Topics & Categories",
-        subtitle="Articles organized by cybersecurity topic — browse malware analysis, data breaches, AI security, cloud threats, and more.",
-        icon="🏷️"
-    )
-else:
-    render_page_header(
-        title="Threat Classification",
-        subtitle="Articles categorized into cybersecurity threat vectors using LLM intelligence and keyword analysis.",
-        icon="🏷️"
-    )
+render_page_header(
+    title="Topics & Categories",
+    subtitle="Articles organized by cybersecurity topic — browse malware analysis, data breaches, AI security, cloud threats, and more.",
+    icon="🏷️"
+)
 
 # ============================================
 # Pipeline: Collect → Deduplicate → Classify

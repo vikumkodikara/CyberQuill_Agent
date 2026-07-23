@@ -17,11 +17,6 @@ st.set_page_config(page_title="RAG Testing — CyberQuill", page_icon="📚", la
 
 render_sidebar_controls()
 
-# Gate: Debug Mode only
-if is_magazine_mode():
-    st.info("🔒 This page is available in **Debug Mode** only. Enable Debug Mode from the sidebar toggle.")
-    st.stop()
-
 render_page_header(
     title="RAG Vector Search Playground",
     subtitle="Query the ChromaDB vector database index containing OWASP Top 10, NIST CSF 2.0, and MITRE ATT&CK security frameworks.",

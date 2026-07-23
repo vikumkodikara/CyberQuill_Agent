@@ -313,228 +313,149 @@ if "pipeline_result" in st.session_state:
 
 st.markdown('<div class="section-title">🧭 Explore CyberQuill</div>', unsafe_allow_html=True)
 
-if magazine_mode:
-    # Magazine Mode: 4 cards (hide RAG Testing & Agent Logs)
-    c1, c2 = st.columns(2)
+c1, c2, c3 = st.columns(3)
 
-    with c1:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb;">📰</div>
-                    <span class="nav-card-tag" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">LIVE FEED</span>
-                </div>
-                <div class="nav-card-title">News Feed</div>
-                <div class="nav-card-desc">
-                    Browse the latest cybersecurity news collected in real-time from top security publications and threat intelligence sources.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/1_Latest_News.py", label="Browse News →", icon="📰", use_container_width=True)
-
-    with c2:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); color: #dc2626;">🏷️</div>
-                    <span class="nav-card-tag" style="background:#fef2f2; color:#b91c1c; border-color:#fca5a5;">CURATED</span>
-                </div>
-                <div class="nav-card-title">Topics & Categories</div>
-                <div class="nav-card-desc">
-                    Explore articles organized by topic — malware analysis, data breaches, AI security, cloud threats, and more.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/2_Categories.py", label="View Topics →", icon="🏷️", use_container_width=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    c3, c4 = st.columns(2)
-
-    with c3:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #9333ea;">📄</div>
-                    <span class="nav-card-tag" style="background:#faf5ff; color:#7e22ce; border-color:#d8b4fe;">PUBLISH</span>
-                </div>
-                <div class="nav-card-title">Publish New Issue</div>
-                <div class="nav-card-desc">
-                    Generate a new magazine issue — curated articles are enriched, professionally written, reviewed, and compiled into a downloadable PDF.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/4_Generate_Magazine.py", label="Publish Issue →", icon="📄", use_container_width=True)
-
-    with c4:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #475569;">ℹ️</div>
-                    <span class="nav-card-tag" style="background:#f8fafc; color:#334155; border-color:#cbd5e1;">ABOUT</span>
-                </div>
-                <div class="nav-card-title">About CyberQuill</div>
-                <div class="nav-card-desc">
-                    Learn about CyberQuill's mission, the intelligence sources we monitor, and the technology behind the platform.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/6_About.py", label="Learn More →", icon="ℹ️", use_container_width=True)
-
-else:
-    # Debug Mode: Full 6-card grid
-    c1, c2, c3 = st.columns(3)
-
-    with c1:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb;">📰</div>
-                    <span class="nav-card-tag" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">LIVE RSS</span>
-                </div>
-                <div class="nav-card-title">Latest News</div>
-                <div class="nav-card-desc">
-                    Browse raw cybersecurity feeds collected in real-time from top sources. Filter by provider or search article titles.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/1_Latest_News.py", label="Explore News Feeds →", icon="📰", use_container_width=True)
-
-    with c2:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); color: #dc2626;">🏷️</div>
-                    <span class="nav-card-tag" style="background:#fef2f2; color:#b91c1c; border-color:#fca5a5;">AI CLASSIFIED</span>
-                </div>
-                <div class="nav-card-title">Threat Categories</div>
-                <div class="nav-card-desc">
-                    View articles organized by threat classification, malware types, zero-days, and AI security with confidence metrics.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/2_Categories.py", label="View Categories →", icon="🏷️", use_container_width=True)
-
-    with c3:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); color: #16a34a;">📚</div>
-                    <span class="nav-card-tag" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">VECTOR RAG</span>
-                </div>
-                <div class="nav-card-title">RAG Testing</div>
-                <div class="nav-card-desc">
-                    Interactively query ChromaDB vector index loaded with OWASP Top 10, NIST CSF 2.0, and MITRE ATT&CK knowledge.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/3_RAG_Testing.py", label="Test RAG Queries →", icon="📚", use_container_width=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    c4, c5, c6 = st.columns(3)
-
-    with c4:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #9333ea;">📄</div>
-                    <span class="nav-card-tag" style="background:#faf5ff; color:#7e22ce; border-color:#d8b4fe;">PUBLISH PDF</span>
-                </div>
-                <div class="nav-card-title">Generate Magazine</div>
-                <div class="nav-card-desc">
-                    Run the multi-agent pipeline from end-to-end with real-time feedback and download your compiled PDF magazine issue.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/4_Generate_Magazine.py", label="Generate Magazine →", icon="📄", use_container_width=True)
-
-    with c5:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #ea580c;">📋</div>
-                    <span class="nav-card-tag" style="background:#fff7ed; color:#c2410c; border-color:#fdba74;">REAL-TIME LOGS</span>
-                </div>
-                <div class="nav-card-title">Agent Logs</div>
-                <div class="nav-card-desc">
-                    Monitor agent state transitions, reflection loops, API calls, and structured logs with level filters.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/5_Agent_Logs.py", label="View System Logs →", icon="📋", use_container_width=True)
-
-    with c6:
-        st.markdown("""
-        <div class="nav-card">
-            <div>
-                <div class="nav-card-top">
-                    <div class="nav-card-icon" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #475569;">ℹ️</div>
-                    <span class="nav-card-tag" style="background:#f8fafc; color:#334155; border-color:#cbd5e1;">SYSTEM INFO</span>
-                </div>
-                <div class="nav-card-title">Architecture & About</div>
-                <div class="nav-card-desc">
-                    Explore the system design, LangGraph state graph, design patterns, LLM fallback strategy, and RSS sources.
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.page_link("pages/6_About.py", label="View Architecture →", icon="ℹ️", use_container_width=True)
-
-
-# ============================================
-# Pipeline Architecture Visualization (Debug Mode only)
-# ============================================
-
-if is_debug_mode():
-    st.markdown('<div class="section-title" style="margin-top: 3rem;">⚡ LangGraph Pipeline Flow</div>', unsafe_allow_html=True)
-
-    p_cols = st.columns(7)
-    pipeline_steps = [
-        ("1", "📡", "Collector", "RSS Feeds"),
-        ("2", "🔍", "Duplicate", "Deduplication"),
-        ("3", "🏷️", "Classifier", "Attack Vector"),
-        ("4", "📚", "RAG", "Knowledge Base"),
-        ("5", "✍️", "Writer", "Article Gen"),
-        ("6", "📝", "Reviewer", "Quality Check"),
-        ("7", "📄", "PDF", "Publication"),
-    ]
-
-    for i, (num, icon, name, desc) in enumerate(pipeline_steps):
-        with p_cols[i]:
-            st.markdown(
-                f"""<div class="pipeline-step-card">
-                    <span class="pipeline-step-num">STEP {num}</span>
-                    <div class="pipeline-step-icon">{icon}</div>
-                    <div class="pipeline-step-title">{name}</div>
-                    <div class="pipeline-step-desc">{desc}</div>
-                </div>""",
-                unsafe_allow_html=True,
-            )
-
+with c1:
     st.markdown("""
-    <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 0.9rem 1.25rem; text-align: center; font-size: 0.88rem; color: #475569; margin-top: 1.25rem;">
-        ⟳ <b>Reflection Quality Loop:</b> Reviewer Agent validates compliance & scores output. Triggers automated revision up to 2 cycles if required.
+    <div class="nav-card">
+        <div>
+            <div class="nav-card-top">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb;">📰</div>
+                <span class="nav-card-tag" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">LIVE FEED</span>
+            </div>
+            <div class="nav-card-title">News Feed</div>
+            <div class="nav-card-desc">
+                Browse the latest cybersecurity news collected in real-time from top security publications and threat intelligence sources.
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
+    st.page_link("pages/1_Latest_News.py", label="Browse News →", icon="📰", use_container_width=True)
+
+with c2:
+    st.markdown("""
+    <div class="nav-card">
+        <div>
+            <div class="nav-card-top">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); color: #dc2626;">🏷️</div>
+                <span class="nav-card-tag" style="background:#fef2f2; color:#b91c1c; border-color:#fca5a5;">CURATED</span>
+            </div>
+            <div class="nav-card-title">Topics & Categories</div>
+            <div class="nav-card-desc">
+                Explore articles organized by topic — malware analysis, data breaches, AI security, cloud threats, and more.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.page_link("pages/2_Categories.py", label="View Topics →", icon="🏷️", use_container_width=True)
+
+with c3:
+    st.markdown("""
+    <div class="nav-card">
+        <div>
+            <div class="nav-card-top">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); color: #16a34a;">📚</div>
+                <span class="nav-card-tag" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">VECTOR RAG</span>
+            </div>
+            <div class="nav-card-title">RAG Testing</div>
+            <div class="nav-card-desc">
+                Query ChromaDB vector index loaded with OWASP Top 10, NIST CSF 2.0, and MITRE ATT&CK knowledge frameworks.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.page_link("pages/3_RAG_Testing.py", label="Test RAG Queries →", icon="📚", use_container_width=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+c4, c5, c6 = st.columns(3)
+
+with c4:
+    st.markdown("""
+    <div class="nav-card">
+        <div>
+            <div class="nav-card-top">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #9333ea;">📄</div>
+                <span class="nav-card-tag" style="background:#faf5ff; color:#7e22ce; border-color:#d8b4fe;">PUBLISH</span>
+            </div>
+            <div class="nav-card-title">Publish New Issue</div>
+            <div class="nav-card-desc">
+                Generate a new magazine issue — curated articles are enriched, professionally written, reviewed, and compiled into a downloadable PDF.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.page_link("pages/4_Generate_Magazine.py", label="Publish Issue →", icon="📄", use_container_width=True)
+
+with c5:
+    st.markdown("""
+    <div class="nav-card">
+        <div>
+            <div class="nav-card-top">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #ea580c;">📋</div>
+                <span class="nav-card-tag" style="background:#fff7ed; color:#c2410c; border-color:#fdba74;">TELEMETRY</span>
+            </div>
+            <div class="nav-card-title">Agent Logs</div>
+            <div class="nav-card-desc">
+                Monitor agent execution logs, reflection cycles, state updates, and system telemetry in real-time.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.page_link("pages/5_Agent_Logs.py", label="View System Logs →", icon="📋", use_container_width=True)
+
+with c6:
+    st.markdown("""
+    <div class="nav-card">
+        <div>
+            <div class="nav-card-top">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #475569;">ℹ️</div>
+                <span class="nav-card-tag" style="background:#f8fafc; color:#334155; border-color:#cbd5e1;">ABOUT</span>
+            </div>
+            <div class="nav-card-title">About CyberQuill</div>
+            <div class="nav-card-desc">
+                Learn about CyberQuill's mission, the intelligence sources we monitor, and the technology behind the platform.
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.page_link("pages/6_About.py", label="Learn More →", icon="ℹ️", use_container_width=True)
+
+
+# ============================================
+# Pipeline Architecture Visualization
+# ============================================
+
+st.markdown('<div class="section-title" style="margin-top: 3rem;">⚡ LangGraph Pipeline Flow</div>', unsafe_allow_html=True)
+
+p_cols = st.columns(7)
+pipeline_steps = [
+    ("1", "📡", "Collector", "RSS Feeds"),
+    ("2", "🔍", "Duplicate", "Deduplication"),
+    ("3", "🏷️", "Classifier", "Attack Vector"),
+    ("4", "📚", "RAG", "Knowledge Base"),
+    ("5", "✍️", "Writer", "Article Gen"),
+    ("6", "📝", "Reviewer", "Quality Check"),
+    ("7", "📄", "PDF", "Publication"),
+]
+
+for i, (num, icon, name, desc) in enumerate(pipeline_steps):
+    with p_cols[i]:
+        st.markdown(
+            f"""<div class="pipeline-step-card">
+                <span class="pipeline-step-num">STEP {num}</span>
+                <div class="pipeline-step-icon">{icon}</div>
+                <div class="pipeline-step-title">{name}</div>
+                <div class="pipeline-step-desc">{desc}</div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
+st.markdown("""
+<div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 0.9rem 1.25rem; text-align: center; font-size: 0.88rem; color: #475569; margin-top: 1.25rem;">
+    ⟳ <b>Reflection Quality Loop:</b> Reviewer Agent validates compliance & scores output. Triggers automated revision up to 2 cycles if required.
+</div>
+""", unsafe_allow_html=True)
 
 # ============================================
 # Footer
