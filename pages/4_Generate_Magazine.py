@@ -4,7 +4,6 @@ CyberQuill — Generate Magazine Page
 
 Runs the full pipeline and generates a downloadable PDF magazine.
 Shows progress for each pipeline stage with reader-friendly status updates.
-Supports Magazine Mode (clean display) and Debug Mode (full metrics).
 """
 
 import streamlit as st
@@ -233,32 +232,19 @@ if "pipeline_result" in st.session_state:
             if display_art.technical_analysis:
                 st.markdown("---")
                 st.markdown("### Technical Analysis")
-                    st.markdown(display_art.technical_analysis)
-                if display_art.impact:
-                    st.markdown("---")
-                    st.markdown("### Impact Assessment")
-                    st.markdown(display_art.impact)
-                if display_art.recommendations:
-                    st.markdown("---")
-                    st.markdown("### Recommendations")
-                    st.markdown(display_art.recommendations)
-                if display_art.references:
-                    st.markdown("---")
-                    st.markdown("### References")
-                    st.markdown(display_art.references)
-        else:
-            # Debug mode: expanders with scores
-            status_icon = "✅" if (rev and rev.approved) else "⚠️"
-            score_val = rev.quality_score if rev else "N/A"
-
-            with st.expander(f"{status_icon} {art.title} (Score: {score_val}/10)"):
-                st.markdown(f"**Category:** `{art.category}`")
-                if art.executive_summary:
-                    st.markdown(f"**Executive Summary:** {art.executive_summary}")
-                if art.original_link:
-                    st.markdown(f"🔗 [View Original Article]({art.original_link})")
-                if rev and rev.issues:
-                    st.warning("Quality Review Feedback: " + ", ".join(rev.issues))
+                st.markdown(display_art.technical_analysis)
+            if display_art.impact:
+                st.markdown("---")
+                st.markdown("### Impact Assessment")
+                st.markdown(display_art.impact)
+            if display_art.recommendations:
+                st.markdown("---")
+                st.markdown("### Recommendations")
+                st.markdown(display_art.recommendations)
+            if display_art.references:
+                st.markdown("---")
+                st.markdown("### References")
+                st.markdown(display_art.references)
 
     # ============================================
     # Issue History

@@ -4,7 +4,6 @@ CyberQuill — About Page
 
 Project information, architecture overview, design patterns used,
 and technology stack documentation.
-Supports Magazine Mode (simplified) and Debug Mode (full technical details).
 """
 
 import streamlit as st
@@ -13,8 +12,6 @@ from utils.theme import render_page_header, render_sidebar_controls
 st.set_page_config(page_title="About — CyberQuill", page_icon="ℹ️", layout="wide")
 
 render_sidebar_controls()
-
-magazine_mode = is_magazine_mode()
 
 render_page_header(
     title="About CyberQuill — Architecture & Design",
