@@ -10,7 +10,6 @@ Supports Magazine/Debug modes with softer language in Magazine mode.
 import streamlit as st
 import pandas as pd
 from utils.theme import render_page_header, get_category_badge_html, render_sidebar_controls
-from utils.helpers import is_magazine_mode
 
 st.set_page_config(page_title="Topics — CyberQuill", page_icon="🏷️", layout="wide")
 
@@ -106,13 +105,8 @@ st.markdown("<br>", unsafe_allow_html=True)
 for article in display_articles:
     badge_html = get_category_badge_html(article.category)
 
-    if magazine_mode:
-        # Softer language: "Relevance" instead of "AI Confidence"
-        conf_pct = int(article.confidence * 100)
-        confidence_label = f"Relevance: {conf_pct}%"
-    else:
-        conf_pct = int(article.confidence * 100)
-        confidence_label = f"AI Confidence: {conf_pct}%"
+    conf_pct = int(article.confidence * 100)
+    confidence_label = f"Relevance: {conf_pct}%"
 
     st.markdown(f"""
     <div class="article-card">

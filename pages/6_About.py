@@ -9,7 +9,6 @@ Supports Magazine Mode (simplified) and Debug Mode (full technical details).
 
 import streamlit as st
 from utils.theme import render_page_header, render_sidebar_controls
-from utils.helpers import is_magazine_mode, is_debug_mode
 
 st.set_page_config(page_title="About — CyberQuill", page_icon="ℹ️", layout="wide")
 

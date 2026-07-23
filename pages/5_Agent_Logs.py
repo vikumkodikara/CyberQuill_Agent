@@ -11,7 +11,6 @@ This page is only visible in Debug Mode.
 import streamlit as st
 from pathlib import Path
 from utils.theme import render_page_header, render_sidebar_controls
-from utils.helpers import is_magazine_mode
 
 st.set_page_config(page_title="Agent Logs — CyberQuill", page_icon="📋", layout="wide")
 

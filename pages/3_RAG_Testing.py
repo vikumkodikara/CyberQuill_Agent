@@ -11,7 +11,6 @@ In Magazine Mode, it redirects to the home page.
 
 import streamlit as st
 from utils.theme import render_page_header, render_sidebar_controls
-from utils.helpers import is_magazine_mode
 
 st.set_page_config(page_title="RAG Testing — CyberQuill", page_icon="📚", layout="wide")
 

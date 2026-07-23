@@ -15,7 +15,7 @@ import streamlit as st
 from pathlib import Path
 from datetime import datetime
 from utils.theme import apply_custom_theme, render_sidebar_controls, get_category_pill_style
-from utils.helpers import is_magazine_mode, is_debug_mode, estimate_article_reading_time
+from utils.helpers import estimate_article_reading_time
 
 # ============================================
 # Page Configuration
@@ -216,34 +216,17 @@ st.markdown("""
 # Hero Section
 # ============================================
 
-magazine_mode = is_magazine_mode()
-
-if magazine_mode:
-    # Reader-friendly hero
-    hero_badge_text = "Cybersecurity Intelligence"
-    hero_subtitle = (
-        "Your trusted source for curated cybersecurity intelligence, threat analysis, "
-        "and expert insights — delivered as a professionally crafted digital magazine."
-    )
-    feature_pills = [
-        "🔍 Threat Intelligence",
-        "📊 Security Research",
-        "🏢 Industry Analysis",
-        "💡 Expert Insights",
-    ]
-else:
-    # Debug-mode hero
-    hero_badge_text = "Autonomous Cyber Threat Intelligence"
-    hero_subtitle = (
-        "An end-to-end multi-agent AI system that aggregates cybersecurity feeds, deduplicates threat signals, "
-        "classifies attack vectors, enriches context via RAG vector search, and generates publication-ready PDF magazines."
-    )
-    feature_pills = [
-        "🤖 6 Specialized Agents",
-        "🔄 LangGraph Reflection Loop",
-        "📚 ChromaDB Vector RAG",
-        "📄 ReportLab PDF Publishing",
-    ]
+hero_badge_text = "Cybersecurity Intelligence Platform"
+hero_subtitle = (
+    "Your trusted platform for curated cybersecurity intelligence, threat analysis, "
+    "and multi-agent magazine generation — delivered as professionally formatted publications."
+)
+feature_pills = [
+    "🔍 Threat Intelligence",
+    "📊 Security Research",
+    "🏢 Industry Analysis",
+    "💡 Expert Insights",
+]
 
 pills_html = "".join(f'<div class="feature-pill">{p}</div>' for p in feature_pills)
 
@@ -285,7 +268,7 @@ if "pipeline_result" in st.session_state:
 
 if "pipeline_result" in st.session_state:
     m_articles = st.session_state["pipeline_result"].get("magazine_articles", [])
-    if m_articles and magazine_mode:
+    if m_articles:
         featured = m_articles[0]
         read_time = estimate_article_reading_time(featured)
         bg, fg, border = get_category_pill_style(featured.category)
