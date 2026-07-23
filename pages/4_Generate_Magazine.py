@@ -28,7 +28,7 @@ render_page_header(
 # Pipeline Controls
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>🚀 Generate Magazine</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>Generate Magazine</h4>", unsafe_allow_html=True)
 
 col_run, col_opts = st.columns([1, 2])
 
