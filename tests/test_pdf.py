@@ -174,7 +174,7 @@ class TestGetStyles:
         required = [
             "cover_title", "cover_subtitle", "cover_date", "cover_stats",
             "toc_heading", "toc_entry", "toc_category",
-            "article_title", "article_category", "section_heading",
+            "article_title", "article_meta", "section_heading",
             "body", "reference_item", "footer",
         ]
         for key in required:
@@ -192,7 +192,7 @@ class TestBuildCover:
         """Should return a list of flowable elements."""
         styles = _get_styles()
         articles = [make_sample_article()]
-        elements = _build_cover(articles, styles)
+        elements = _build_cover(articles, styles, 1)
         assert isinstance(elements, list)
         assert len(elements) > 0
 
@@ -201,7 +201,7 @@ class TestBuildCover:
         from reportlab.platypus import PageBreak
         styles = _get_styles()
         articles = [make_sample_article()]
-        elements = _build_cover(articles, styles)
+        elements = _build_cover(articles, styles, 1)
         assert isinstance(elements[-1], PageBreak)
 
     def test_cover_with_multiple_categories(self):
@@ -212,7 +212,7 @@ class TestBuildCover:
             make_sample_article(title="Cloud Breach", category="Cloud Security"),
             make_sample_article(title="Zero Day", category="Zero-Day"),
         ]
-        elements = _build_cover(articles, styles)
+        elements = _build_cover(articles, styles, 1)
         assert len(elements) > 0
 
 

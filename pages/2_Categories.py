@@ -4,19 +4,32 @@ CyberQuill — Categories Page
 
 Displays articles grouped by threat category after classification.
 Shows classification confidence and category distribution.
+Supports Magazine/Debug modes with softer language in Magazine mode.
 """
 
 import streamlit as st
 import pandas as pd
-from utils.theme import render_page_header, get_category_badge_html
+from utils.theme import render_page_header, get_category_badge_html, render_sidebar_controls
+from utils.helpers import is_magazine_mode
 
-st.set_page_config(page_title="Categories — CyberQuill", page_icon="🏷️", layout="wide")
+st.set_page_config(page_title="Topics — CyberQuill", page_icon="🏷️", layout="wide")
 
-render_page_header(
-    title="Threat Classification",
-    subtitle="Articles categorized into cybersecurity threat vectors using LLM intelligence and keyword analysis.",
-    icon="🏷️"
-)
+render_sidebar_controls()
+
+magazine_mode = is_magazine_mode()
+
+if magazine_mode:
+    render_page_header(
+        title="Topics & Categories",
+        subtitle="Articles organized by cybersecurity topic — browse malware analysis, data breaches, AI security, cloud threats, and more.",
+        icon="🏷️"
+    )
+else:
+    render_page_header(
+        title="Threat Classification",
+        subtitle="Articles categorized into cybersecurity threat vectors using LLM intelligence and keyword analysis.",
+        icon="🏷️"
+    )
 
 # ============================================
 # Pipeline: Collect → Deduplicate → Classify
@@ -35,7 +48,7 @@ def _get_classified_articles():
     return classified
 
 
-with st.spinner("Analyzing threat signals & classifying categories..."):
+with st.spinner("Analyzing and categorizing articles..."):
     try:
         classified = _get_classified_articles()
     except Exception as e:
@@ -57,7 +70,7 @@ if not classified:
 # Category Distribution
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-top:1.5rem; margin-bottom:1rem;'>📊 Threat Category Breakdown</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-top:1.5rem; margin-bottom:1rem;'>📊 Category Breakdown</h4>", unsafe_allow_html=True)
 
 categories: dict[str, int] = {}
 for article in classified:
@@ -74,9 +87,9 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Bar chart
 df = pd.DataFrame(
     sorted(categories.items(), key=lambda x: x[1], reverse=True),
-    columns=["Threat Category", "Article Count"],
+    columns=["Category", "Article Count"],
 )
-st.bar_chart(df, x="Threat Category", y="Article Count", color="#6366f1")
+st.bar_chart(df, x="Category", y="Article Count", color="#6366f1")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -84,7 +97,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Category Filter & Articles
 # ============================================
 
-st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; color:#0f172a; margin-bottom:1rem;'>📰 Articles by Threat Category</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='font-family:\"Space Grotesk\", sans-serif; font-weight:700; margin-bottom:1rem;'>📰 Articles by Category</h4>", unsafe_allow_html=True)
 
 selected_cat = st.selectbox(
     "Filter by Category",
@@ -101,8 +114,15 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 for article in display_articles:
     badge_html = get_category_badge_html(article.category)
-    conf_pct = int(article.confidence * 100)
-    
+
+    if magazine_mode:
+        # Softer language: "Relevance" instead of "AI Confidence"
+        conf_pct = int(article.confidence * 100)
+        confidence_label = f"Relevance: {conf_pct}%"
+    else:
+        conf_pct = int(article.confidence * 100)
+        confidence_label = f"AI Confidence: {conf_pct}%"
+
     st.markdown(f"""
     <div class="article-card">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 0.6rem;">
@@ -114,7 +134,7 @@ for article in display_articles:
         <div style="display:flex; gap:16px; margin-bottom:0.75rem; font-size:0.82rem; color:#64748b; align-items:center;">
             <span>📡 <b>Source:</b> {article.source}</span>
             <span>🗓️ <b>Published:</b> {article.published or 'Recent'}</span>
-            <span style="color:#4f46e5; font-weight:700;">🎯 <b>AI Confidence:</b> {conf_pct}%</span>
+            <span style="color:#4f46e5; font-weight:700;">🎯 <b>{confidence_label}</b></span>
         </div>
         <div style="font-size:0.92rem; color:#475569; line-height:1.55;">
             {article.summary[:300] + ("..." if len(article.summary) > 300 else "") if article.summary else "No preview summary available."}
