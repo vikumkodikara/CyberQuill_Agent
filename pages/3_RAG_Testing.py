@@ -82,7 +82,7 @@ if query:
     with st.spinner("Searching vector embeddings..."):
         try:
             from agents.rag import retrieve_context
-            context, sources = retrieve_context(query, n_results=num_results)
+            context, sources = retrieve_context(query, top_k=num_results)
         except Exception as e:
             st.error(f"Retrieval failed: {e}")
             context, sources = "", []
