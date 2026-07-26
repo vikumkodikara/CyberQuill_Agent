@@ -84,72 +84,68 @@ for i, (cat, count) in enumerate(sorted_cats):
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Bar chart — Dark Cybersecurity Terminal Plotly Theme
-df = pd.DataFrame(
-    sorted_cats,
-    columns=["Category", "Article Count"],
-)
+# Custom High-Tech Dark Cybersecurity Distribution Graph (HTML/CSS)
+total_articles = sum(categories.values()) or 1
 
-try:
-    import plotly.express as px
+bar_rows_html = []
+for cat, count in sorted_cats:
+    color = get_category_left_border(cat)
+    pct = round((count / total_articles) * 100, 1)
+    bar_width = max(pct, 4)  # min 4% width for visibility
 
-    fig = px.bar(
-        df,
-        x="Category",
-        y="Article Count",
-        text="Article Count",
-        color="Category",
-        color_discrete_map={cat: get_category_left_border(cat) for cat, _ in sorted_cats},
-    )
+    # Category icon mapping
+    cat_lower = cat.lower()
+    if "malware" in cat_lower or "ransomware" in cat_lower:
+        icon = "🐛"
+    elif "breach" in cat_lower or "leak" in cat_lower:
+        icon = "🔓"
+    elif "phish" in cat_lower or "social" in cat_lower:
+        icon = "🎣"
+    elif "ai" in cat_lower or "llm" in cat_lower:
+        icon = "🤖"
+    elif "vuln" in cat_lower or "cve" in cat_lower:
+        icon = "⚠️"
+    elif "zero-day" in cat_lower or "zero day" in cat_lower:
+        icon = "⚡"
+    elif "cloud" in cat_lower:
+        icon = "☁️"
+    elif "intel" in cat_lower or "threat" in cat_lower:
+        icon = "🔍"
+    else:
+        icon = "🏷️"
 
-    fig.update_layout(
-        paper_bgcolor="#111827",
-        plot_bgcolor="#111827",
-        margin=dict(l=30, r=30, t=40, b=80),
-        height=360,
-        showlegend=False,
-        font=dict(family="JetBrains Mono, monospace", color="#94A3B8"),
-        xaxis=dict(
-            title=dict(text="Category", font=dict(color="#00D4FF", size=12)),
-            tickfont=dict(color="#CBD5E1", size=11),
-            showgrid=False,
-            zeroline=False,
-            tickangle=-25,
-        ),
-        yaxis=dict(
-            title=dict(text="Article Count", font=dict(color="#00D4FF", size=12)),
-            tickfont=dict(color="#94A3B8", size=11),
-            gridcolor="#1F2937",
-            zerolinecolor="#1F2937",
-        ),
-    )
+    pct_label = f"{int(pct)}%" if pct >= 7 else ""
 
-    fig.update_traces(
-        marker=dict(line=dict(width=1, color="#1F2937")),
-        textposition="auto",
-        textfont=dict(color="#F1F5F9", family="JetBrains Mono, monospace", size=12),
-        hovertemplate="<b>%{x}</b><br>Articles: %{y}<extra></extra>",
-    )
+    bar_rows_html.append(f"""
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 14px;">
+        <div style="width: 200px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #E2E8F0; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+            <span style="font-size: 14px;">{icon}</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{cat}</span>
+        </div>
+        <div style="flex-grow: 1; background: #0A0E1A; border: 1px solid #1F2937; border-radius: 6px; height: 28px; padding: 2px; position: relative; overflow: hidden;">
+            <div style="width: {bar_width}%; background: linear-gradient(90deg, {color}99, {color}); height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; box-shadow: 0 0 10px {color}33;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #0A0E1A;">{pct_label}</span>
+            </div>
+        </div>
+        <div style="width: 110px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: {color}; flex-shrink: 0;">
+            {count} <span style="font-size: 11px; color: #64748B; font-weight: 400;">({pct}%)</span>
+        </div>
+    </div>
+    """)
 
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-except ImportError:
-    try:
-        import altair as alt
-
-        chart = (
-            alt.Chart(df)
-            .mark_bar(color="#00D4FF", cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
-            .encode(
-                x=alt.X("Category:N", axis=alt.Axis(labelAngle=-25, labelColor="#CBD5E1", titleColor="#00D4FF")),
-                y=alt.Y("Article Count:Q", axis=alt.Axis(labelColor="#94A3B8", titleColor="#00D4FF", gridColor="#1F2937")),
-                tooltip=["Category", "Article Count"],
-            )
-            .properties(height=320)
-            .configure_view(strokeWidth=0)
-        )
-        st.altair_chart(chart, use_container_width=True)
-    except Exception:
-        st.bar_chart(df, x="Category", y="Article Count", color="#00D4FF")
+st.markdown(f"""
+<div style="background: #111827; border: 1px solid #1F2937; border-radius: 10px; padding: 22px 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1F2937; padding-bottom: 12px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #00D4FF; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+            <span>📊</span> THREAT CATEGORY DISTRIBUTION GRAPH
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748B;">
+            {len(categories)} CATEGORIES &bull; {total_articles} ARTICLES
+        </div>
+    </div>
+    {"".join(bar_rows_html)}
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
