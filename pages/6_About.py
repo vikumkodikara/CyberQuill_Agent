@@ -48,11 +48,32 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+```mermaid
+graph LR
+    A[📡 1. Collector] --> B[🔍 2. Duplicate]
+    B --> C[🏷️ 3. Classifier]
+    C --> D[📚 4. RAG Agent]
+    D --> E[✍️ 5. Writer Agent]
+    E --> F[📝 6. Reviewer Agent]
+    F -- "Revise (< 8/10)" --> E
+    F -- "Approved (>= 8/10)" --> G[📄 7. PDF Generator]
+
+    style A fill:#0D1117,stroke:#34D399,stroke-width:2px,color:#F1F5F9
+    style B fill:#0D1117,stroke:#A78BFA,stroke-width:2px,color:#F1F5F9
+    style C fill:#0D1117,stroke:#FF3366,stroke-width:2px,color:#F1F5F9
+    style D fill:#0D1117,stroke:#00D4FF,stroke-width:2px,color:#F1F5F9
+    style E fill:#0D1117,stroke:#FCD34D,stroke-width:2px,color:#F1F5F9
+    style F fill:#0D1117,stroke:#FF6B00,stroke-width:2px,color:#F1F5F9
+    style G fill:#0D1117,stroke:#00D4FF,stroke-width:2px,color:#F1F5F9
+```
+""")
+
 topology_html = (
     f'<div style="background: #111827; border: 1px solid #1F2937; border-radius: 12px; padding: 24px 28px; margin-bottom: 2rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);">'
     f'<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1F2937; padding-bottom: 14px;">'
     f'<div style="font-family: \'JetBrains Mono\', monospace; font-size: 12px; font-weight: 700; color: #00D4FF; letter-spacing: 0.12em; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">'
-    f'<span class="pulse-dot"></span> LANGGRAPH STATEGRAPH PIPELINE TOPOLOGY'
+    f'<span class="pulse-dot"></span> PIPELINE STAGE SPECIFICATION'
     f'</div>'
     f'<div style="font-family: \'JetBrains Mono\', monospace; font-size: 11px; color: #64748B; background: #00D4FF12; border: 1px solid #00D4FF33; padding: 3px 10px; border-radius: 4px;">'
     f'7 STAGE AUTONOMOUS PIPELINE'
