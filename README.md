@@ -2,6 +2,8 @@
 
 **CyberQuill** is a multi-agent cybersecurity intelligence platform that collects cybersecurity news from multiple RSS feeds, removes duplicates, classifies articles, enriches content using Retrieval-Augmented Generation (RAG), generates magazine-style cybersecurity articles, reviews generated content using a reflection agent, and exports the final output as downloadable PDF magazines.
 
+**Live Streamlit Demo:** [CyberQuill Live Demo (Local Deployment)](#) *(Note: Replace `#` with your actual deployment URL if hosted online)*
+
 ## 🏗️ Architecture
 
 ```
@@ -94,6 +96,15 @@ pytest tests/ -v
 
 ## 🛠️ Technology Stack
 
+### Model-Choice Comparison
+
+| Provider | Model | Role | Rationale |
+|----------|-------|------|-----------|
+| **Groq** | `llama-3.3-70b-versatile` | Classifier, Writer, Reviewer | Blazing-fast inference speeds necessary for processing multiple articles per issue without timeouts. High instruction-following capability for structured JSON output and drafting. |
+| **OpenRouter** | `meta-llama/llama-4-maverick` | Fallback / Complex Reasoning | Specialized model configured for tackling complex reasoning tasks and deeply nuanced cybersecurity topics when standard fast models fall short. |
+
+### Technologies
+
 - **Framework**: Streamlit, LangGraph
 - **LLM Providers**: Groq, OpenRouter
 - **Vector Store**: ChromaDB
@@ -108,3 +119,10 @@ This project is for academic purposes.
 ## 👤 Author
 
 Vikum Kodikara
+
+## ⚠️ Known Limitations
+
+- **Processing Time**: The pipeline can take several minutes to run entirely depending on the number of articles collected and API rate limits.
+- **Dependency on RSS Feeds**: If the source feeds go down or change their XML structure, the collector may fail to parse new articles.
+- **API Rate Limits**: Aggressive fetching and writing can hit rate limits on free tiers of Groq or OpenRouter.
+- **RAG Context Size**: The context window limits how much of the framework PDF content can be injected at once, occasionally resulting in truncated references.

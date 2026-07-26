@@ -84,12 +84,53 @@ for i, (cat, count) in enumerate(sorted_cats):
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Bar chart
+# Bar chart — Dark Cybersecurity Terminal Plotly Theme
 df = pd.DataFrame(
     sorted_cats,
     columns=["Category", "Article Count"],
 )
-st.bar_chart(df, x="Category", y="Article Count", color="#00D4FF")
+
+import plotly.express as px
+
+fig = px.bar(
+    df,
+    x="Category",
+    y="Article Count",
+    text="Article Count",
+    color="Category",
+    color_discrete_map={cat: get_category_left_border(cat) for cat, _ in sorted_cats},
+)
+
+fig.update_layout(
+    paper_bgcolor="#111827",
+    plot_bgcolor="#111827",
+    margin=dict(l=20, r=20, t=20, b=60),
+    height=340,
+    showlegend=False,
+    font=dict(family="JetBrains Mono, monospace", color="#94A3B8"),
+    xaxis=dict(
+        title=dict(text="Category", font=dict(color="#00D4FF", size=12)),
+        tickfont=dict(color="#CBD5E1", size=11),
+        showgrid=False,
+        zeroline=False,
+        tickangle=-20,
+    ),
+    yaxis=dict(
+        title=dict(text="Article Count", font=dict(color="#00D4FF", size=12)),
+        tickfont=dict(color="#64748B", size=11),
+        gridcolor="#1F2937",
+        zerolinecolor="#1F2937",
+    ),
+)
+
+fig.update_traces(
+    marker=dict(line=dict(width=1, color="#1F2937")),
+    textposition="outside",
+    textfont=dict(color="#00D4FF", family="JetBrains Mono, monospace", size=12),
+    hovertemplate="<b>%{x}</b><br>Articles: %{y}<extra></extra>",
+)
+
+st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 st.markdown("<br>", unsafe_allow_html=True)
 
