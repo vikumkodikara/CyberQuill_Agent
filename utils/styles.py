@@ -726,7 +726,7 @@ def inject_dark_theme():
         }
 
         /* =============================================
-           CHART STYLING (Dark Theme Container & Canvas)
+           CHART STYLING (Dark Theme Containers)
            ============================================= */
 
         .js-plotly-plot .plotly,
@@ -736,22 +736,17 @@ def inject_dark_theme():
             background-color: #111827 !important;
         }
 
-        /* Streamlit Vega-Lite / bar chart dark override */
-        [data-testid="stVegaLiteChart"],
-        [data-testid="stVegaLiteChart"] > div,
-        .vega-embed,
-        .vega-embed summary,
-        .vega-embed canvas,
-        .vega-embed svg {
+        /* Streamlit Vega-Lite / bar chart dark container */
+        [data-testid="stVegaLiteChart"] {
             background-color: #111827 !important;
-            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            border-radius: 8px !important;
+            padding: 16px !important;
         }
 
-        [data-testid="stVegaLiteChart"] {
-            border: 1px solid #1F2937;
-            border-radius: 8px;
-            padding: 12px;
-            background-color: #111827 !important;
+        .vega-embed {
+            background-color: transparent !important;
+            background: transparent !important;
         }
 
         /* SVG text elements inside charts */

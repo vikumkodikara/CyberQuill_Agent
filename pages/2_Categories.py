@@ -105,8 +105,8 @@ try:
     fig.update_layout(
         paper_bgcolor="#111827",
         plot_bgcolor="#111827",
-        margin=dict(l=20, r=20, t=20, b=60),
-        height=340,
+        margin=dict(l=30, r=30, t=40, b=80),
+        height=360,
         showlegend=False,
         font=dict(family="JetBrains Mono, monospace", color="#94A3B8"),
         xaxis=dict(
@@ -114,11 +114,11 @@ try:
             tickfont=dict(color="#CBD5E1", size=11),
             showgrid=False,
             zeroline=False,
-            tickangle=-20,
+            tickangle=-25,
         ),
         yaxis=dict(
             title=dict(text="Article Count", font=dict(color="#00D4FF", size=12)),
-            tickfont=dict(color="#64748B", size=11),
+            tickfont=dict(color="#94A3B8", size=11),
             gridcolor="#1F2937",
             zerolinecolor="#1F2937",
         ),
@@ -126,8 +126,8 @@ try:
 
     fig.update_traces(
         marker=dict(line=dict(width=1, color="#1F2937")),
-        textposition="outside",
-        textfont=dict(color="#00D4FF", family="JetBrains Mono, monospace", size=12),
+        textposition="auto",
+        textfont=dict(color="#F1F5F9", family="JetBrains Mono, monospace", size=12),
         hovertemplate="<b>%{x}</b><br>Articles: %{y}<extra></extra>",
     )
 
@@ -140,11 +140,11 @@ except ImportError:
             alt.Chart(df)
             .mark_bar(color="#00D4FF", cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
             .encode(
-                x=alt.X("Category:N", axis=alt.Axis(labelAngle=-20, labelColor="#CBD5E1", titleColor="#00D4FF")),
-                y=alt.Y("Article Count:Q", axis=alt.Axis(labelColor="#64748B", titleColor="#00D4FF", gridColor="#1F2937")),
+                x=alt.X("Category:N", axis=alt.Axis(labelAngle=-25, labelColor="#CBD5E1", titleColor="#00D4FF")),
+                y=alt.Y("Article Count:Q", axis=alt.Axis(labelColor="#94A3B8", titleColor="#00D4FF", gridColor="#1F2937")),
                 tooltip=["Category", "Article Count"],
             )
-            .properties(background="#111827", height=320)
+            .properties(height=320)
             .configure_view(strokeWidth=0)
         )
         st.altair_chart(chart, use_container_width=True)
