@@ -485,26 +485,110 @@ def inject_dark_theme():
         }
 
         /* =============================================
-           INPUTS & SELECTS
+           INPUTS & SELECTS (BaseWeb Dark Cybersecurity Theme)
            ============================================= */
 
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div,
-        .stMultiSelect > div > div {
+        .stTextInput input,
+        .stNumberInput input,
+        .stTextArea textarea,
+        div[data-baseweb="select"],
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="base-input"],
+        div[data-baseweb="input"] {
             background-color: #111827 !important;
+            background: #111827 !important;
             border-color: #1F2937 !important;
             color: #E2E8F0 !important;
             font-family: 'JetBrains Mono', monospace !important;
+            border-radius: 6px !important;
         }
 
-        .stTextInput > div > div > input:focus {
+        /* Focus & Hover states for BaseWeb controls */
+        div[data-baseweb="select"]:hover > div,
+        div[data-baseweb="base-input"]:hover,
+        .stTextInput input:focus,
+        .stTextArea textarea:focus {
             border-color: #00D4FF66 !important;
             box-shadow: 0 0 0 1px #00D4FF44 !important;
         }
 
-        .stMultiSelect [data-baseweb="tag"] {
-            background: #00D4FF15 !important;
-            border: 1px solid #00D4FF33 !important;
+        /* Multiselect / Selectbox inner input text */
+        div[data-baseweb="select"] input {
+            color: #E2E8F0 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            background: transparent !important;
+        }
+
+        /* Dropdown icons (arrow down, clear x) */
+        div[data-baseweb="select"] svg,
+        [data-baseweb="icon"] {
+            fill: #64748B !important;
+            color: #64748B !important;
+        }
+
+        div[data-baseweb="select"] svg:hover,
+        [data-baseweb="icon"]:hover {
+            fill: #00D4FF !important;
+            color: #00D4FF !important;
+        }
+
+        /* Multiselect Tags / Badges (Selected Items) */
+        [data-baseweb="tag"] {
+            background: #00D4FF1A !important;
+            border: 1px solid #00D4FF44 !important;
+            border-radius: 4px !important;
+            padding: 2px 8px !important;
+            margin: 2px !important;
+        }
+
+        [data-baseweb="tag"] span,
+        [data-baseweb="tag"] div {
+            color: #00D4FF !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+        }
+
+        [data-baseweb="tag"] [data-baseweb="icon"],
+        [data-baseweb="tag"] svg {
+            fill: #00D4FF !important;
+            color: #00D4FF !important;
+            cursor: pointer !important;
+        }
+
+        [data-baseweb="tag"] [data-baseweb="icon"]:hover,
+        [data-baseweb="tag"] svg:hover {
+            fill: #FF3366 !important;
+            color: #FF3366 !important;
+        }
+
+        /* Dropdown Popover & Menu Options */
+        [data-baseweb="popover"],
+        [data-baseweb="menu"],
+        div[role="listbox"],
+        ul[role="listbox"] {
+            background-color: #111827 !important;
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        [data-baseweb="option"],
+        li[role="option"],
+        div[role="option"] {
+            background-color: #111827 !important;
+            color: #CBD5E1 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 13px !important;
+            padding: 8px 12px !important;
+        }
+
+        [data-baseweb="option"]:hover,
+        li[role="option"]:hover,
+        div[role="option"]:hover,
+        [aria-selected="true"][data-baseweb="option"] {
+            background-color: #1F2937 !important;
             color: #00D4FF !important;
         }
 
@@ -642,19 +726,55 @@ def inject_dark_theme():
         }
 
         /* =============================================
-           CHART STYLING
+           CHART STYLING (Dark Theme Container & Canvas)
            ============================================= */
 
-        .js-plotly-plot .plotly {
+        .js-plotly-plot .plotly,
+        .js-plotly-plot .plotly .main-svg,
+        .js-plotly-plot .plotly .bg {
+            background: #111827 !important;
+            background-color: #111827 !important;
+        }
+
+        /* Streamlit Vega-Lite / bar chart dark override */
+        [data-testid="stVegaLiteChart"],
+        [data-testid="stVegaLiteChart"] > div,
+        .vega-embed,
+        .vega-embed summary,
+        .vega-embed canvas,
+        .vega-embed svg {
+            background-color: #111827 !important;
             background: #111827 !important;
         }
 
-        /* Streamlit bar chart dark override */
         [data-testid="stVegaLiteChart"] {
-            background: #111827 !important;
             border: 1px solid #1F2937;
             border-radius: 8px;
             padding: 12px;
+            background-color: #111827 !important;
+        }
+
+        /* SVG text elements inside charts */
+        [data-testid="stVegaLiteChart"] text,
+        .vega-embed text {
+            fill: #94A3B8 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        [data-testid="stVegaLiteChart"] line,
+        [data-testid="stVegaLiteChart"] path.domain {
+            stroke: #1F2937 !important;
+        }
+
+        /* Vega action menu items */
+        .vega-embed .vega-actions {
+            background-color: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            border-radius: 6px !important;
+        }
+
+        .vega-embed .vega-actions a {
+            color: #00D4FF !important;
         }
 
         /* =============================================
