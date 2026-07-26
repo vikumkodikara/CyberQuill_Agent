@@ -21,28 +21,7 @@ CyberQuill uses a **sequential pipeline** of 6 AI agents orchestrated by [LangGr
 | **Writer** | Generates magazine-style articles with full analysis |
 | **Reviewer** | Reviews, critiques, and approves articles for publication |
 
-### 🔄 Agent Communication Diagram
-
-```mermaid
-graph TD
-    RSS[RSS Feeds] -->|Raw Articles| Collector
-    Collector -->|Articles List| Duplicate[Duplicate Filter]
-    Duplicate -->|Unique Articles| Classifier
-    Classifier -->|Categorized Articles| RAG[RAG Agent]
-    RAG -->|Enriched Articles| Writer
-    Writer -->|Draft Articles| Reviewer
-    Reviewer -->|Approved| PDF[PDF Generator]
-    Reviewer -->|Rejected| Writer
-```
-
-### 📚 RAG Pipeline Explanation
-
-The **RAG (Retrieval-Augmented Generation) Pipeline** enhances collected cybersecurity news with deep context from verified security frameworks (OWASP Top 10, NIST CSF 2.0, MITRE ATT&CK). 
-1. **Indexing**: Framework PDFs are chunked and embedded using `Sentence-Transformers (all-MiniLM-L6-v2)` into a persistent local `ChromaDB` vector store.
-2. **Retrieval**: When an article is processed, the RAG Agent queries the vector store for conceptually related security chunks based on the article's classification and summary.
-3. **Augmentation**: The retrieved context is injected into the Writer Agent's prompt, ensuring the generated magazine article contains expert-level, framework-aligned analysis instead of generic hallucinations.
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
