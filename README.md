@@ -168,7 +168,7 @@ APIs supply dynamic real-time headlines, while the local RAG knowledge base prov
 
 | Aspect | Implementation Details |
 | :--- | :--- |
-| **Knowledge Base Corpus** | `data/documents/` (Markdown files covering OWASP Top 10, MITRE ATT&CK, NIST CSF, Ransomware, Cloud Security, SQL Injection) |
+| **Knowledge Base Corpus** | `data/documents/` (20 curated Markdown topic documents covering OWASP, MITRE ATT&CK, NIST CSF, Zero-Day Exploits, AI Security, Zero Trust, Ransomware, Cloud Security, DevSecOps, API Security, Container/K8s, IAM, IR, Malware Analysis, DDoS, Cryptography/PKI, Threat Intel, IoT Security, etc.) |
 | **Chunking Strategy** | Heading & paragraph splitting (~500–1000 characters per chunk with overlap) |
 | **Embeddings** | `sentence-transformers/all-MiniLM-L6-v2` |
 | **Vector Store** | `ChromaDB` (Persistent storage at `./chroma_db`) |
