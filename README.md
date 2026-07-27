@@ -2,10 +2,31 @@
 
 **CyberQuill** is an autonomous multi-agent cybersecurity intelligence platform orchestrated with [LangGraph](https://github.com/langchain-ai/langgraph). Specialized AI agents collect news from multiple RSS feeds, deduplicate articles, classify security threats, enrich content using Retrieval-Augmented Generation (RAG) over a vector store, write magazine-style analytical articles, perform reflection quality reviews, and generate downloadable PDF magazines.
 
-**Live Streamlit Demo:** [CyberQuill Live Demo](#) *(Local / Hosted Streamlit deployment)*  
-*Educational demonstration only — non-commercial academic research project.*
+**Live Streamlit Demo:** [https://cyberquillagent-93zujbgqd8wwfuzm4why6b.streamlit.app/]
+## 🏗️ Architecture
 
----
+```
+Collector → Duplicate → Classifier → RAG → Writer → Reviewer → PDF
+```
+
+CyberQuill uses a **sequential pipeline** of 6 AI agents orchestrated by [LangGraph](https://github.com/langchain-ai/langgraph):
+
+| Agent | Role |
+|-------|------|
+| **Collector** | Fetches cybersecurity news from RSS feeds |
+| **Duplicate** | Removes duplicate articles using URL and title matching |
+| **Classifier** | Categorizes articles (Malware, Data Breach, Zero-Day, etc.) |
+| **RAG** | Enriches articles with context from a cybersecurity knowledge base |
+| **Writer** | Generates magazine-style articles with full analysis |
+| **Reviewer** | Reviews, critiques, and approves articles for publication |
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.13+
+- [Groq API Key](https://console.groq.com/keys)
+- [OpenRouter API Key](https://openrouter.ai/keys)
 
 ## 🚀 Quick Start (Local)
 
