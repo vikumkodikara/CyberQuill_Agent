@@ -85,14 +85,33 @@ CyberQuill/
 pytest tests/ -v
 ```
 
-## 📰 RSS Sources
+## 🎓 Educational Purpose & Disclaimer
 
-- The Hacker News
-- Bleeping Computer
-- Krebs on Security
-- SecurityWeek
-- Dark Reading
-- CISA
+> [!IMPORTANT]
+> **This project is developed strictly for educational, academic, and research purposes only.**
+
+- **Non-Commercial Use:** CyberQuill is an academic and technical demonstration project designed to explore multi-agent AI architectures, LangGraph pipeline orchestration, Retrieval-Augmented Generation (RAG), and automated cybersecurity intelligence synthesis. It is not intended for commercial monetization, paid distribution, or proprietary publication.
+- **Content Ownership & Copyright:** All news articles, headlines, excerpts, and original metadata retrieved by CyberQuill remain the sole intellectual property and copyright of their respective original publishers, authors, and security research institutions.
+- **Fair Use Notice:** News content parsed from publicly accessible RSS feeds is ingested, categorized, and summarized under Fair Use principles for academic study and technological proof-of-concept demonstration.
+
+---
+
+## 📰 News Source Credits & Attribution
+
+CyberQuill aggregates real-time security intelligence using public RSS feeds from prominent cybersecurity journalism outlets and official government advisory channels. Full credit, copyright, and publishing rights belong entirely to the original content creators listed below:
+
+| Source | Description | Official Website |
+| :--- | :--- | :--- |
+| **The Hacker News** | Global cybersecurity news platform covering cyber threats, vulnerabilities, and malware analysis. | [thehackernews.com](https://thehackernews.com) |
+| **BleepingComputer** | Security and tech publication specializing in ransomware outbreaks, vulnerabilities, and tech news. | [bleepingcomputer.com](https://www.bleepingcomputer.com) |
+| **Krebs on Security** | Investigative cybersecurity journalism focused on cybercrime, data breaches, and security threats by Brian Krebs. | [krebsonsecurity.com](https://krebsonsecurity.com) |
+| **SecurityWeek** | Enterprise cybersecurity news platform delivering insights on threat intelligence, risk, and compliance. | [securityweek.com](https://www.securityweek.com) |
+| **Dark Reading** | Cyber risk management and operational security network for IT and security professionals. | [darkreading.com](https://www.darkreading.com) |
+| **CISA** | Official alerts, vulnerability bulletins, and infrastructure security advisories from the Cybersecurity & Infrastructure Security Agency. | [cisa.gov](https://www.cisa.gov) |
+
+*We express our sincere appreciation and credit to these publishers and investigative journalists for providing open RSS feeds that empower cybersecurity awareness and educational research.*
+
+---
 
 ## 🛠️ Technology Stack
 
@@ -112,9 +131,9 @@ pytest tests/ -v
 - **PDF**: ReportLab
 - **Language**: Python 3.13+
 
-## 📄 License
+## 📄 License & Fair Use
 
-This project is for academic purposes.
+This project is open-sourced strictly for academic, educational, and research evaluation under non-commercial terms.
 
 ## 👤 Author
 
