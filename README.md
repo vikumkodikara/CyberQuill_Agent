@@ -2,8 +2,7 @@
 
 **CyberQuill** is a multi-agent cybersecurity intelligence platform that collects cybersecurity news from multiple RSS feeds, removes duplicates, classifies articles, enriches content using Retrieval-Augmented Generation (RAG), generates magazine-style cybersecurity articles, reviews generated content using a reflection agent, and exports the final output as downloadable PDF magazines.
 
-**Live Streamlit Demo:** [CyberQuill Live Demo (Local Deployment)](#) *(Note: Replace `#` with your actual deployment URL if hosted online)*
-
+**Live Streamlit Demo:** [https://cyberquillagent-93zujbgqd8wwfuzm4why6b.streamlit.app/]
 ## 🏗️ Architecture
 
 ```
