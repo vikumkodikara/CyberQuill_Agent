@@ -37,22 +37,57 @@ streamlit run streamlit_app.py
 
 ## 🏗️ Architecture & Pipeline Flow
 
+```mermaid
+graph TD
+    subgraph Feeds["📰 Data Ingestion"]
+        RSS["RSS Feeds (6 Outlets)"]
+    end
+
+    subgraph Pipeline["🤖 LangGraph Multi-Agent Sequential Pipeline"]
+        Collector["Stage 1: Collector Agent<br/>(RSS Parsing)"]
+        Duplicate["Stage 2: Deduplication Agent<br/>(URL & Title Normalization)"]
+        Classifier["Stage 3: Classifier Agent<br/>(Security Domain Tagging)"]
+        RAG["Stage 4: RAG Agent<br/>(Context Enrichment)"]
+        Writer["Stage 5: Writer Agent<br/>(Magazine Article Drafting)"]
+        Reviewer["Stage 6: Reviewer Agent<br/>(Reflection & Quality Scoring)"]
+        Decision{"Quality Gate<br/>Score >= 7 OR<br/>Max Revisions?"}
+        PDF["Stage 7: PDF Generator<br/>(ReportLab Rendering)"]
+    end
+
+    subgraph Knowledge["📚 Vector Knowledge Store"]
+        Chroma["ChromaDB Vector Store<br/>(OWASP, MITRE ATT&CK, NIST CSF)"]
+    end
+
+    RSS --> Collector
+    Collector --> Duplicate
+    Duplicate --> Classifier
+    Classifier --> RAG
+    Chroma <--> RAG
+    RAG --> Writer
+    Writer --> Reviewer
+    Reviewer --> Decision
+    Decision -- "No (Score < 7 & Revisions < Max)" --> Writer
+    Decision -- "Yes (Score >= 7 OR Max Revisions)" --> PDF
+    PDF --> Output["📄 Final Magazine PDF & Streamlit Issue"]
+
+    classDef agent fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+    classDef decision fill:#7c2d12,stroke:#f97316,stroke-width:2px,color:#fff;
+    classDef source fill:#0f172a,stroke:#64748b,stroke-width:1px,color:#94a3b8;
+    classDef output fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5;
+
+    class Collector,Duplicate,Classifier,RAG,Writer,Reviewer agent;
+    class Decision decision;
+    class RSS,Chroma source;
+    class PDF,Output output;
 ```
-┌───────────┐    ┌───────────┐    ┌────────────┐    ┌──────────┐
-│ Collector │───▶│ Duplicate │───▶│ Classifier │───▶│   RAG    │
-└───────────┘    └───────────┘    └────────────┘    └────┬─────┘
-                                                         │
-               ┌─────────────────────────────────────────┘
-               ▼
-           ┌────────┐    ┌──────────┐    ┌─────────────────┐
-           │ Writer │───▶│ Reviewer │───▶│ Should Revise?  │
-           └───▲────┘    └──────────┘    └────────┬────────┘
-               │                                  │
-               │ score < 7 & revisions < max      │ score >= 7 or max revisions
-               └──────────────────────────────────▼
-                                              ┌───────┐
-                                              │  PDF  │
-                                              └───────┘
+
+```
+[ RSS Feeds ] ──▶ [ Collector ] ──▶ [ Duplicate ] ──▶ [ Classifier ] ──▶ [ RAG Agent ] ◀──▶ [ ChromaDB KB ]
+                                                                             │
+                                                                             ▼
+[ Final PDF ] ◀── [ PDF Generator ] ◀── [ Quality Gate ] ◀── [ Reviewer ] ◀── [ Writer Agent ]
+                                               │                                  │
+                                               └──────── ( Revision Loop ) ───────┘
 ```
 
 ### Agent Roles & Responsibilities
@@ -101,7 +136,6 @@ Report contracts are defined in [`models/schemas.py`](file:///e:/Projects/CyberQ
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Classification, Writing, Reviewing** | **Groq** | `llama-3.3-70b-versatile` | Ultra-low | Near-free / Low | 128k context, strong JSON parsing | Blazing-fast inference speed required for multi-article processing without Streamlit timeouts. |
 | **Fallback & Complex Reasoning** | **OpenRouter** | `meta-llama/llama-4-maverick` | Low-medium | Low | High reasoning capability | Reliable secondary fallback for complex threat analysis when primary provider hits limits. |
-| **Embeddings** | **HuggingFace** | `all-MiniLM-L6-v2` | Instant | Free (local CPU) | 384-dimensional dense vectors | Lightweight local vector embedding for semantic RAG search. |
 
 *Configured in `.env` / Streamlit secrets. Deterministic fallbacks keep the application functional even without active API keys.*
 
