@@ -24,8 +24,11 @@ render_page_header(
 # Pipeline: Collect → Deduplicate → Classify
 # ============================================
 
+CLASSIFICATION_CACHE_VERSION = 3
+
+
 @st.cache_data(ttl=300, show_spinner=False)
-def _get_classified_articles():
+def _get_classified_articles(_cache_version: int = CLASSIFICATION_CACHE_VERSION):
     """Runs collection, deduplication, and classification."""
     from agents.collector import collect_all_feeds
     from agents.duplicate import remove_duplicates
@@ -61,16 +64,14 @@ if not classified:
 uncategorized_count = sum(1 for a in classified if a.category == "Uncategorized")
 uncategorized_rate = (uncategorized_count / len(classified)) * 100 if classified else 0
 
-if uncategorized_count > 0:
-    if uncategorized_rate > 5:
-        st.warning(
-            f"**{uncategorized_count} articles ({uncategorized_rate:.1f}%)** are Uncategorized. "
-            f"Target is 2-3%. Review uncategorized items below or click Re-classify."
-        )
-    else:
-        st.info(
-            f"{uncategorized_count} article(s) ({uncategorized_rate:.1f}%) remain Uncategorized — within acceptable range."
-        )
+if uncategorized_count > 0 and uncategorized_rate > 5:
+    st.warning(
+        f"**{uncategorized_count} articles ({uncategorized_rate:.1f}%)** remain uncategorized after auto-classification."
+    )
+elif uncategorized_count > 0:
+    st.info(
+        f"{uncategorized_count} article(s) ({uncategorized_rate:.1f}%) remain Uncategorized — within acceptable range."
+    )
 
 quick_col1, quick_col2, _ = st.columns([1, 1, 2])
 with quick_col1:
@@ -225,6 +226,7 @@ for article in display_articles:
         "keyword": "Keywords",
         "forced_llm": "Forced LLM",
         "best_guess": "Best guess",
+        "mandatory": "Auto-assigned",
         "uncategorized": "Unclassified",
     }
     method_label = method_labels.get(method, method)
