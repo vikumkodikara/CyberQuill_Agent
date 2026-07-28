@@ -224,7 +224,7 @@ if "pipeline_result" in st.session_state:
                 st.download_button(
                     label="⬇️ Download CyberQuill Magazine (PDF)",
                     data=f.read(),
-                    file_name=p_path.name,
+                    file_name="CyberQuill_Magazine.pdf",
                     mime="application/pdf",
                     type="primary",
                     use_container_width=True,
