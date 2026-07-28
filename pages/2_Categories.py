@@ -47,12 +47,6 @@ with st.spinner("Analyzing and categorizing articles..."):
         st.error(f"Pipeline failed: {e}")
         classified = []
 
-col_act, col_spacer = st.columns([1, 4])
-with col_act:
-    if st.button("🔄 Re-classify", use_container_width=True):
-        st.cache_data.clear()
-        st.rerun()
-
 if not classified:
     st.warning("No classified articles available.")
     st.stop()
@@ -72,16 +66,6 @@ elif uncategorized_count > 0:
     st.info(
         f"{uncategorized_count} article(s) ({uncategorized_rate:.1f}%) remain Uncategorized — within acceptable range."
     )
-
-quick_col1, quick_col2, _ = st.columns([1, 1, 2])
-with quick_col1:
-    if st.button("🔎 Show Uncategorized Only", use_container_width=True):
-        st.session_state["category_filter"] = "Uncategorized"
-        st.rerun()
-with quick_col2:
-    if st.button("📋 Show All Categories", use_container_width=True):
-        st.session_state["category_filter"] = "All Categories"
-        st.rerun()
 
 
 # ============================================
