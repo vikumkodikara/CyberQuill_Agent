@@ -1,5 +1,5 @@
 {
-  "next_issue": 135,
+  "next_issue": 136,
   "issues": [
     {
       "issue_number": 1,
@@ -1373,6 +1373,16 @@
       "date_display": "July 2026",
       "article_count": 1,
       "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-18\\test_output_directory_created0\\nested\\output\\test_nested.pdf",
+      "categories": {
+        "Malware": 1
+      }
+    },
+    {
+      "issue_number": 135,
+      "date": "2026-07-28 19:53:00",
+      "date_display": "July 2026",
+      "article_count": 1,
+      "pdf_path": "C:\\Users\\LENOVO\\AppData\\Local\\Temp\\pytest-of-LENOVO\\pytest-19\\test_default_filename0\\CyberQuill_Magazine.pdf",
       "categories": {
         "Malware": 1
       }

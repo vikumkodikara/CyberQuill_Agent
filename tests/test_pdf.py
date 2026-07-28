@@ -335,13 +335,13 @@ class TestGeneratePdf:
 
         assert "my_magazine.pdf" in path
 
-    def test_default_filename_has_timestamp(self, test_output_dir):
-        """Default filename should include a timestamp."""
+    def test_default_filename(self, test_output_dir):
+        """Default filename should be CyberQuill_Magazine.pdf."""
         articles = [make_sample_article()]
         path = generate_pdf(articles)
 
-        assert "cyberquill_" in path
-        assert path.endswith(".pdf")
+        assert path is not None
+        assert path.endswith("CyberQuill_Magazine.pdf")
 
     def test_multiple_articles(self, test_output_dir):
         """Should handle multiple articles without errors."""

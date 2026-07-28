@@ -89,6 +89,7 @@ logger = get_logger(__name__)
 
 # Output directory for generated PDFs
 OUTPUT_DIR = Path("data/output")
+DEFAULT_PDF_FILENAME = "CyberQuill_Magazine.pdf"
 
 # Page dimensions
 PAGE_WIDTH, PAGE_HEIGHT = A4  # 595.27 x 841.89 points
@@ -722,7 +723,7 @@ def generate_pdf(
     Args:
         articles: List of MagazineArticle objects to include
         output_filename: Optional filename for the PDF.
-                         Defaults to "cyberquill_YYYYMMDD_HHMMSS.pdf"
+                         Defaults to "CyberQuill_Magazine.pdf"
         issue_number: Optional issue number. If None, auto-generated.
 
     Returns:
@@ -759,8 +760,7 @@ def generate_pdf(
 
     # Generate filename
     if not output_filename:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_filename = f"cyberquill_issue{_current_issue_number:03d}_{timestamp}.pdf"
+        output_filename = DEFAULT_PDF_FILENAME
 
     output_path = OUTPUT_DIR / output_filename
 
