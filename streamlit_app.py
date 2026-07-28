@@ -251,11 +251,6 @@ for i, (num, icon, name, desc) in enumerate(pipeline_steps):
             unsafe_allow_html=True,
         )
 
-st.markdown("""
-<div style="background: #111827; border: 1px solid #1F2937; border-radius: 8px; padding: 0.9rem 1.25rem; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #64748B; margin-top: 1rem;">
-    ⟳ <span style="color: #A78BFA;">REFLECTION LOOP</span> — Reviewer validates compliance & scores output. Triggers automated revision up to 2 cycles.
-</div>
-""", unsafe_allow_html=True)
 
 # ============================================
 # Footer
