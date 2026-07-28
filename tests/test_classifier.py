@@ -223,8 +223,8 @@ class TestUncategorizedRate:
         uncategorized = sum(1 for r in results if r.category == UNCATEGORIZED)
         rate = uncategorized / len(results)
 
-        assert rate <= 0.05, (
-            f"Uncategorized rate {rate:.1%} exceeds 5% target "
+        assert rate == 0.0, (
+            f"Uncategorized rate {rate:.1%} should be 0% with mandatory fallback "
             f"({uncategorized}/{len(results)} articles)"
         )
 
@@ -267,13 +267,14 @@ class TestClassifyArticle:
         result = classify_article(article)
         assert result.category in settings.CATEGORIES + [UNCATEGORIZED]
 
-    def test_non_security_can_remain_uncategorized(self):
+    def test_non_security_gets_mandatory_category(self):
         article = make_article(
             "Company Announces New Office Location",
             "The firm expands into a new downtown building.",
         )
         result = classify_article(article)
-        assert result.category == UNCATEGORIZED
+        assert result.category in settings.CATEGORIES
+        assert result.classification_method == "mandatory"
 
 
 class TestClassifyArticles:

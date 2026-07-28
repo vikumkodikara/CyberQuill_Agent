@@ -183,12 +183,15 @@ def _classify_by_keywords(title: str, summary: str) -> tuple[str, float]:
     return best_category, best_confidence
 
 
-def _best_guess_category(title: str, summary: str) -> tuple[str, float]:
+def _best_guess_category(
+    title: str, summary: str, *, force: bool = False
+) -> tuple[str, float]:
     """
     Last-resort classification for security articles with weak signals.
     Picks the category with the highest partial keyword overlap.
+    When force=True, always assigns a category (for trusted RSS feed content).
     """
-    if not _is_security_article(title, summary):
+    if not force and not _is_security_article(title, summary):
         return UNCATEGORIZED, 0.0
 
     text = f"{title} {summary}".lower()
@@ -210,6 +213,52 @@ def _best_guess_category(title: str, summary: str) -> tuple[str, float]:
     best_category = max(scores, key=scores.get)
     confidence = min(0.25 + scores[best_category] * 0.1, 0.5)
     return best_category, confidence
+
+
+def _classify_by_title_tokens(title: str) -> tuple[str, float]:
+    """Match category names and keywords using title tokens only."""
+    text = title.lower()
+    scores: dict[str, float] = {}
+
+    for category in settings.CATEGORIES:
+        if category.lower() in text:
+            scores[category] = scores.get(category, 0) + 2.0
+
+    for category, keywords in CATEGORY_KEYWORDS.items():
+        for keyword in keywords:
+            if keyword in text:
+                scores[category] = scores.get(category, 0) + 1.0
+
+    for alias, category in CATEGORY_ALIASES.items():
+        if alias in text:
+            scores[category] = scores.get(category, 0) + 0.75
+
+    if not scores:
+        return UNCATEGORIZED, 0.0
+
+    best_category = max(scores, key=scores.get)
+    confidence = min(0.3 + scores[best_category] * 0.1, 0.55)
+    return best_category, confidence
+
+
+def _mandatory_classify(title: str, summary: str) -> tuple[str, float]:
+    """
+    Guaranteed classification for RSS feed articles.
+    Tries progressively looser matchers until a category is assigned.
+    """
+    attempts = [
+        _classify_by_keywords(title, summary),
+        _classify_by_keywords(title, ""),
+        _classify_by_keywords("", summary or title),
+        _classify_by_title_tokens(title),
+        _best_guess_category(title, summary, force=True),
+    ]
+
+    for category, confidence in attempts:
+        if category != UNCATEGORIZED:
+            return category, max(confidence, 0.2)
+
+    return "Threat Intelligence", 0.2
 
 
 def _invoke_llm(prompt: str) -> str:
@@ -312,6 +361,10 @@ def classify_article(article: Article) -> ClassifiedArticle:
         category, confidence = _best_guess_category(title, summary)
         if category != UNCATEGORIZED:
             method = "best_guess"
+
+    if category == UNCATEGORIZED:
+        category, confidence = _mandatory_classify(title, summary)
+        method = "mandatory"
 
     logger.debug(
         f"Classified '{title[:50]}...' as {category} "

@@ -35,6 +35,39 @@ Possible improvements:
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _load_streamlit_secrets_into_environ() -> None:
+    """Mirror Streamlit Cloud secrets into os.environ for pydantic-settings."""
+    import os
+
+    try:
+        import streamlit as st
+    except ImportError:
+        return
+
+    try:
+        secrets = st.secrets
+    except Exception:
+        return
+
+    for key in (
+        "GROQ_API_KEY",
+        "OPENROUTER_API_KEY",
+        "GROQ_MODEL",
+        "OPENROUTER_MODEL",
+        "CHROMA_PERSIST_DIR",
+        "LOG_LEVEL",
+    ):
+        try:
+            value = secrets.get(key)
+        except Exception:
+            continue
+        if value and not os.environ.get(key):
+            os.environ[key] = str(value)
+
+
+_load_streamlit_secrets_into_environ()
+
+
 class Settings(BaseSettings):
     """
     Application settings loaded from environment variables.
