@@ -1,29 +1,53 @@
-# DevSecOps & Pipeline Security
-
-## 1. Concept & Fundamentals
-
-**DevSecOps** integrates security practices directly into every phase of the Software Development Life Cycle (SDLC), moving away from legacy perimeter security and manual end-of-cycle audits toward automated continuous security ("Shift Left").
-
+---
+title: DevSecOps & Pipeline Security
+categories: [Vulnerability Management, Cloud Security]
+keywords: [DevSecOps, CI/CD, SAST, DAST, SCA, shift left, pipeline security]
+frameworks: [OWASP DevSecOps Guideline, NIST SSDF, CIS Controls]
 ---
 
-## 2. CI/CD Security Automation Tools
+# DevSecOps & Pipeline Security
 
-```
-[ Plan ] ──▶ [ Code (Secret Scan) ] ──▶ [ Build (SCA/SAST) ] ──▶ [ Test (DAST) ] ──▶ [ Deploy (IAC Scan) ] ──▶ [ Monitor ]
-```
+## Overview
+
+DevSecOps integrates security practices into the software development lifecycle, embedding automated security testing into CI/CD pipelines. The shift-left approach identifies vulnerabilities early when they are cheapest to fix, reducing production security incidents and accelerating secure software delivery.
+
+## Key Concepts & Attack Vectors
+
+- **CI/CD Pipeline Compromise**: Attackers inject malicious code through compromised build servers, credentials, or dependency poisoning.
+- **Secrets in Source Code**: Hardcoded API keys, passwords, and tokens committed to version control repositories.
+- **Vulnerable Dependencies**: Third-party libraries with known CVEs introduced through supply chain attacks.
+- **Insecure Container Images**: Base images with unpatched vulnerabilities deployed to production environments.
+- **Insufficient Security Testing**: Missing SAST, DAST, and SCA scans allowing vulnerabilities to reach production.
+
+## Detection & Indicators
 
 | Tool Category | Purpose | Examples |
 | :--- | :--- | :--- |
-| **Secret Scanning** | Prevents API keys, credentials, and private certs from entering git repositories. | GitGuardian, TruffleHog |
-| **SAST (Static Analysis)** | Scans source code for security vulnerabilities without running the application. | SonarQube, Semgrep, Bandit |
-| **SCA (Software Composition)** | Identifies known CVEs in open-source third-party dependencies and libraries. | Snyk, OWASP Dependency-Check |
-| **DAST (Dynamic Analysis)** | Tests running web applications against dynamic attack vectors. | OWASP ZAP, Burp Suite |
-| **IaC Scanning** | Validates Terraform, CloudFormation, and Ansible templates for cloud misconfigurations. | Checkov, tfsec |
+| **SAST** | Scans source code for vulnerabilities | SonarQube, Semgrep, Checkmarx |
+| **DAST** | Tests running applications for flaws | OWASP ZAP, Burp Suite |
+| **SCA** | Identifies vulnerable dependencies | Snyk, Dependabot, OWASP Dependency-Check |
+| **Secret Scanning** | Detects credentials in code | GitGuardian, TruffleHog, Gitleaks |
+| **Container Scanning** | Audits container images for CVEs | Trivy, Grype, Clair |
 
----
+## Mitigation & Best Practices
 
-## 3. CI/CD Pipeline Hardening Best Practices
+- **Shift Left Security**: Integrate SAST and SCA into pull request workflows before code merges.
+- **Immutable Infrastructure**: Deploy infrastructure as code with automated compliance scanning.
+- **Secrets Management**: Use vault solutions (HashiCorp Vault, AWS Secrets Manager) instead of hardcoded credentials.
+- **Signed Artifacts**: Sign container images and build artifacts to verify integrity in deployment pipelines.
+- **Least Privilege CI/CD**: Restrict pipeline service account permissions to minimum required scope.
 
-- **Ephemeral Runner Environments**: Use isolated, single-use container runners for build jobs.
-- **Signed Commits & Artifact Attestation**: Enforce GPG signed git commits and SLSA-compliant build provenance.
-- **Principle of Least Privilege for Secrets**: Restrict CI/CD environment variables; inject short-lived OAuth tokens via HashiCorp Vault or OIDC instead of static credentials.
+## Incident Response Considerations
+
+- Halt all pipeline deployments immediately upon detecting compromised build artifacts.
+- Rotate all secrets and credentials accessible from the compromised pipeline.
+- Audit git history and dependency trees for malicious code injection points.
+- Rebuild and re-sign all artifacts from known-good source commits.
+- Update pipeline security controls and add detection rules for the attack vector used.
+
+## Framework References
+
+- OWASP DevSecOps Guideline
+- NIST Secure Software Development Framework (SSDF)
+- SLSA (Supply-chain Levels for Software Artifacts)
+- CIS Control 16: Application Software Security

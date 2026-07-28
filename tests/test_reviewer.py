@@ -22,6 +22,8 @@ import pytest
 
 from agents.reviewer import (
     APPROVAL_THRESHOLD,
+    RAG_FIDELITY_THRESHOLD,
+    _compute_rag_fidelity,
     _format_article_for_review,
     _parse_review_response,
     _review_by_rules,
@@ -242,12 +244,97 @@ class TestParseReviewResponse:
         result = _parse_review_response(text)
         assert result.quality_score <= 10
 
+    def test_parses_rag_fidelity_score(self):
+        """Should extract RAG fidelity score from LLM response."""
+        text = """
+- **Quality Score**: 8
+- **RAG Fidelity Score**: 7
+- **Approved**: YES
+- **Issues Found**: None
+- **RAG Issues**: None
+- **Revised Article**: No changes needed
+"""
+        result = _parse_review_response(text)
+        assert result.rag_fidelity_score == 7
+        assert result.approved is True
+
+    def test_parses_rag_issues(self):
+        """Should extract RAG-specific issues."""
+        text = """
+- **Quality Score**: 7
+- **RAG Fidelity Score**: 4
+- **Approved**: NO
+- **Issues Found**: Grammar issues
+- **RAG Issues**:
+- Claim about quantum encryption not supported by context
+- **Revised Article**: No changes needed
+"""
+        result = _parse_review_response(text)
+        assert result.rag_fidelity_score == 4
+        assert len(result.rag_issues) >= 1
+
     def test_handles_missing_fields(self):
         """Should handle response with missing fields gracefully."""
         text = "This article is good."
         result = _parse_review_response(text)
         assert isinstance(result, ReviewResult)
         assert 1 <= result.quality_score <= 10
+
+
+# ============================================
+# Tests for RAG Fidelity
+# ============================================
+
+class TestRagFidelity:
+    """Tests for RAG-grounded verification."""
+
+    def test_high_overlap_scores_high(self):
+        """Article with overlapping keywords should score high."""
+        article = make_complete_article()
+        rag_context = (
+            "Zero-day vulnerability use-after-free Chrome V8 JavaScript "
+            "engine arbitrary code execution remote patch update browser"
+        )
+        score, issues = _compute_rag_fidelity(article, rag_context)
+        assert score >= RAG_FIDELITY_THRESHOLD
+        assert len(issues) == 0
+
+    def test_low_overlap_scores_low(self):
+        """Article with no overlap should score low."""
+        article = make_complete_article()
+        rag_context = (
+            "xylophone zucchini quasar photon nebula heliotrope "
+            "bamboozle flibbertigibbet kerfuffle"
+        )
+        score, issues = _compute_rag_fidelity(article, rag_context)
+        assert score < RAG_FIDELITY_THRESHOLD
+        assert len(issues) > 0
+
+    def test_empty_rag_context_scores_perfect(self):
+        """Empty RAG context should not penalize the article."""
+        article = make_complete_article()
+        score, issues = _compute_rag_fidelity(article, "")
+        assert score == 10
+        assert issues == []
+
+    def test_review_with_rag_context(self):
+        """review_article should return rag_fidelity_score."""
+        article = make_complete_article()
+        rag_context = (
+            "Zero-day vulnerability Chrome browser patch update "
+            "remote code execution V8 JavaScript engine"
+        )
+        result = review_article(article, rag_context=rag_context)
+        assert hasattr(result, "rag_fidelity_score")
+        assert 1 <= result.rag_fidelity_score <= 10
+
+    def test_low_rag_fidelity_blocks_approval(self):
+        """Low RAG fidelity should prevent approval even with good structure."""
+        article = make_complete_article()
+        rag_context = "completely unrelated kubernetes docker container topic"
+        result = _review_by_rules(article, rag_context=rag_context)
+        if result.rag_fidelity_score < RAG_FIDELITY_THRESHOLD:
+            assert result.approved is False
 
 
 # ============================================

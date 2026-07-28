@@ -57,68 +57,102 @@ if not kb_built:
     st.stop()
 
 # ============================================
-# Query Interface
+# Tabbed Interface: Search + Verify
 # ============================================
 
-st.markdown("""
-<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
-    // EXECUTE RAG SEARCH
-</div>
-""", unsafe_allow_html=True)
+tab_search, tab_verify = st.tabs(["🔍 RAG Search", "✅ Verify Article"])
 
-# Sample query handler
-if "selected_sample" in st.session_state:
-    default_query = st.session_state["selected_sample"]
-else:
-    default_query = ""
+with tab_search:
+    if "selected_sample" in st.session_state:
+        default_query = st.session_state["selected_sample"]
+    else:
+        default_query = ""
 
-col_q, col_k = st.columns([3, 1])
+    col_q, col_k = st.columns([3, 1])
 
-with col_q:
-    query = st.text_input(
-        "Enter natural language query",
-        value=default_query,
-        placeholder="e.g. What is SQL injection? How does ransomware work?",
-    )
+    with col_q:
+        query = st.text_input(
+            "Enter natural language query",
+            value=default_query,
+            placeholder="e.g. What is SQL injection? How does ransomware work?",
+        )
 
-with col_k:
-    num_results = st.slider("Top Chunks (k)", min_value=1, max_value=8, value=3)
+    with col_k:
+        num_results = st.slider("Top Chunks (k)", min_value=1, max_value=8, value=3)
 
-if query:
-    with st.spinner("Searching vector embeddings..."):
-        try:
-            from agents.rag import retrieve_context
-            context, sources = retrieve_context(query, top_k=num_results)
-        except Exception as e:
-            st.error(f"Retrieval failed: {e}")
-            context, sources = "", []
+    if query:
+        with st.spinner("Searching vector embeddings..."):
+            try:
+                from agents.rag import retrieve_chunks_with_metadata, retrieve_context
+                chunk_results = retrieve_chunks_with_metadata(query, top_k=num_results)
+                context, sources = retrieve_context(query, top_k=num_results)
+            except Exception as e:
+                st.error(f"Retrieval failed: {e}")
+                context, sources = "", []
+                chunk_results = []
 
-    if context:
-        from utils.content_sanitizer import sanitize_rag_context_chunks, strip_source_filenames
+        if chunk_results:
+            from utils.content_sanitizer import strip_source_filenames
 
-        clean_chunks = sanitize_rag_context_chunks(context)
-        if clean_chunks:
             st.markdown("""
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin: 1.5rem 0 1rem;">
                 // RETRIEVED INTELLIGENCE CONTEXT
             </div>
             """, unsafe_allow_html=True)
 
-            for idx, chunk in enumerate(clean_chunks, 1):
-                chunk_escaped = chunk.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
+            for idx, chunk_data in enumerate(chunk_results, 1):
+                chunk_text = chunk_data["text"]
+                chunk_escaped = chunk_text.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
+                section = chunk_data.get("section", "")
+                categories = chunk_data.get("categories", "")
+                source_label = strip_source_filenames(chunk_data.get("source", ""))
+                meta_tags = " &nbsp;|&nbsp; ".join(
+                    t for t in [
+                        f"Section: {section}" if section else "",
+                        f"Categories: {categories}" if categories else "",
+                        f"Source: {source_label}" if source_label else "",
+                    ] if t
+                )
                 st.markdown(f"""
                 <div class="rag-chunk" style="background: #111827; border-left: 3px solid #00D4FF; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1F2937;">
                         <span>MATCH #{idx}</span>
                         <span style="background: #00D4FF15; color: #00D4FF; padding: 2px 8px; border-radius: 4px; font-size: 10px;">VERIFIED</span>
                     </div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #64748B; margin-bottom: 8px;">{meta_tags}</div>
                     <div style="font-size: 14px; color: #CBD5E1; line-height: 1.7;">
                         {chunk_escaped}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
+        elif context:
+            from utils.content_sanitizer import sanitize_rag_context_chunks, strip_source_filenames
+
+            clean_chunks = sanitize_rag_context_chunks(context)
+            if clean_chunks:
+                st.markdown("""
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin: 1.5rem 0 1rem;">
+                    // RETRIEVED INTELLIGENCE CONTEXT
+                </div>
+                """, unsafe_allow_html=True)
+
+                for idx, chunk in enumerate(clean_chunks, 1):
+                    chunk_escaped = chunk.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
+                    st.markdown(f"""
+                    <div class="rag-chunk" style="background: #111827; border-left: 3px solid #00D4FF; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1F2937;">
+                            <span>MATCH #{idx}</span>
+                            <span style="background: #00D4FF15; color: #00D4FF; padding: 2px 8px; border-radius: 4px; font-size: 10px;">VERIFIED</span>
+                        </div>
+                        <div style="font-size: 14px; color: #CBD5E1; line-height: 1.7;">
+                            {chunk_escaped}
+                        </div>
+                </div>
+                """, unsafe_allow_html=True)
+
         if sources:
+            from utils.content_sanitizer import strip_source_filenames
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("""
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
@@ -128,34 +162,92 @@ if query:
             clean_sources = [strip_source_filenames(s) for s in sources]
             s_html = "".join([f'<span style="background: #7C3AED15; color: #A78BFA; border: 1px solid #7C3AED33; padding: 4px 12px; border-radius: 4px; font-family: JetBrains Mono, monospace; font-weight: 600; font-size: 11px; display: inline-block; margin-right: 8px; margin-bottom: 8px;">📘 {s}</span>' for s in set(clean_sources) if s])
             st.markdown(f"<div>{s_html}</div>", unsafe_allow_html=True)
-    else:
-        st.info("No relevant context found for this query.")
+        elif not chunk_results and not context:
+            st.info("No relevant context found for this query.")
 
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown('<div style="border-top: 1px solid #1F2937; margin: 0.5rem 0 1.5rem;"></div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div style="border-top: 1px solid #1F2937; margin: 0.5rem 0 1.5rem;"></div>', unsafe_allow_html=True)
 
-# ============================================
-# Sample Queries
-# ============================================
+    st.markdown("""
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+        // SAMPLE QUERIES
+    </div>
+    """, unsafe_allow_html=True)
 
-st.markdown("""
-<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
-    // SAMPLE QUERIES
-</div>
-""", unsafe_allow_html=True)
+    sample_queries = [
+        "What are the OWASP Top 10 vulnerabilities?",
+        "Explain the NIST Cybersecurity Framework core functions",
+        "What is MITRE ATT&CK technique for credential dumping?",
+        "How does ransomware encryption work?",
+        "What are the best practices for cloud security?",
+        "Explain SQL injection attack vectors",
+    ]
 
-sample_queries = [
-    "What are the OWASP Top 10 vulnerabilities?",
-    "Explain the NIST Cybersecurity Framework core functions",
-    "What is MITRE ATT&CK technique for credential dumping?",
-    "How does ransomware encryption work?",
-    "What are the best practices for cloud security?",
-    "Explain SQL injection attack vectors",
-]
+    sq_cols = st.columns(2)
+    for i, sq in enumerate(sample_queries):
+        with sq_cols[i % 2]:
+            if st.button(f"🔍 {sq}", key=f"sq_{i}", use_container_width=True):
+                st.session_state["selected_sample"] = sq
+                st.rerun()
 
-sq_cols = st.columns(2)
-for i, sq in enumerate(sample_queries):
-    with sq_cols[i % 2]:
-        if st.button(f"🔍 {sq}", key=f"sq_{i}", use_container_width=True):
-            st.session_state["selected_sample"] = sq
-            st.rerun()
+with tab_verify:
+    st.markdown("""
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00D4FF; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">
+        // RAG ARTICLE VERIFICATION
+    </div>
+    """, unsafe_allow_html=True)
+
+    verify_text = st.text_area(
+        "Paste article text to verify against knowledge base",
+        height=200,
+        placeholder="Paste a magazine article or technical write-up here...",
+    )
+    verify_category = st.selectbox(
+        "Article Category (boosts relevant sources)",
+        ["", "Malware", "Data Breach", "AI Security", "Cloud Security",
+         "Zero-Day", "Threat Intelligence", "Vulnerability Management"],
+    )
+
+    if verify_text and st.button("✅ Verify Against Knowledge Base", type="primary"):
+        from agents.rag import retrieve_context
+        from agents.reviewer import _compute_rag_fidelity
+        from models.schemas import MagazineArticle
+
+        query = f"{verify_category} {verify_text[:500]}"
+        context, sources = retrieve_context(
+            query, top_k=3, category=verify_category or ""
+        )
+
+        article = MagazineArticle(
+            title="Verification Article",
+            executive_summary=verify_text[:500],
+            background=verify_text[500:1000] if len(verify_text) > 500 else "",
+            technical_analysis=verify_text[1000:1500] if len(verify_text) > 1000 else "",
+            impact="",
+            recommendations="",
+            references="",
+        )
+        rag_score, rag_issues = _compute_rag_fidelity(article, context)
+
+        score_color = "#00FF88" if rag_score >= 6 else "#FF3366"
+        st.markdown(f"""
+        <div style="background: #111827; border: 1px solid #1F2937; border-left: 3px solid {score_color}; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 1rem 0;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: {score_color};">
+                RAG Fidelity Score: {rag_score}/10
+            </div>
+            <div style="font-size: 12px; color: #64748B; margin-top: 4px;">
+                Sources consulted: {', '.join(sources) if sources else 'None'}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if rag_issues:
+            st.warning("Issues found:")
+            for issue in rag_issues:
+                st.markdown(f"- {issue}")
+        else:
+            st.success("Article aligns well with knowledge base context.")
+
+        if context:
+            with st.expander("Retrieved Knowledge Base Context"):
+                st.markdown(context)

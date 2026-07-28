@@ -1,33 +1,51 @@
+---
+title: Cryptography & Public Key Infrastructure
+categories: [Vulnerability Management, Data Breach]
+keywords: [cryptography, PKI, TLS, AES, RSA, ECC, post-quantum, certificates]
+frameworks: [NIST FIPS 140-3, NIST PQC, X.509, TLS 1.3]
+---
+
 # Cryptography & Public Key Infrastructure (PKI)
 
-## 1. Fundamentals
+## Overview
 
-**Cryptography** provides data confidentiality, integrity, authentication, and non-repudiation across digital communications.
+Cryptography provides data confidentiality, integrity, authentication, and non-repudiation across digital communications. Public Key Infrastructure (PKI) establishes the trust framework for digital certificates, enabling secure TLS connections, code signing, and encrypted data exchange across enterprise systems.
 
----
+## Key Concepts & Attack Vectors
 
-## 2. Core Cryptographic Algorithms
+- **Symmetric Encryption**: AES-256 for bulk data encryption at rest and in transit using a single shared key.
+- **Asymmetric Encryption**: RSA and ECC for key exchange and digital signatures; 256-bit ECC provides security equivalent to 3072-bit RSA.
+- **Cryptographic Hash Functions**: SHA-256 and SHA-3 for data integrity verification and password storage.
+- **Certificate Authority Chain**: Root CA issues intermediate CA certificates, which sign end-entity TLS/SSL certificates.
+- **Post-Quantum Threat**: Quantum computers using Shor's algorithm threaten legacy RSA/ECC asymmetric encryption.
 
-- **Symmetric Encryption**: Uses a single shared key for encryption and decryption.
-  - *AES-256 (Advanced Encryption Standard)*: Industry benchmark for bulk data encryption at rest and in transit.
-- **Asymmetric Encryption**: Uses a public key for encryption/verification and a private key for decryption/signing.
-  - *RSA & ECC (Elliptic Curve Cryptography)*: ECC offers equivalent security to RSA with significantly smaller key sizes (e.g., 256-bit ECC ≈ 3072-bit RSA).
-- **Cryptographic Hash Functions**: One-way algorithms producing fixed-size digests (SHA-256, SHA-3) used for data integrity verification.
+## Detection & Indicators
 
----
+- Scan for deprecated protocols (SSLv3, TLS 1.0/1.1) and weak cipher suites in network traffic.
+- Detect expired, self-signed, or improperly chained certificates in TLS handshakes.
+- Monitor for certificate transparency log entries indicating unauthorized certificate issuance.
+- Alert on use of MD5, SHA-1, or DES/3DES algorithms in production systems.
+- Identify private key exposure in code repositories, configuration files, or memory dumps.
 
-## 3. Public Key Infrastructure (PKI) Architecture
+## Mitigation & Best Practices
 
-```
-[ Root CA ] ──▶ [ Intermediate CA ] ──▶ [ End-Entity Certificate (TLS/SSL) ]
-```
+- **TLS 1.3 Enforcement**: Mandate TLS 1.3 with Perfect Forward Secrecy via ephemeral Diffie-Hellman key exchange.
+- **Certificate Lifecycle Management**: Automate certificate provisioning, renewal, and revocation via ACME or enterprise PKI.
+- **Key Management**: Store private keys in HSMs or cloud KMS; never embed keys in source code.
+- **OCSP Stapling**: Enable OCSP stapling to verify certificate revocation status without performance penalty.
+- **Post-Quantum Migration**: Begin inventory and migration planning for NIST-standardized PQC algorithms (CRYSTALS-Kyber, CRYSTALS-Dilithium).
 
-- **Certificate Authority (CA)**: Trusted entity that signs and issues digital certificates (X.509 standard).
-- **Certificate Revocation List (CRL) & OCSP**: Protocols for verifying if a certificate has been revoked before expiration.
-- **TLS 1.3**: Latest transport layer security standard, enforcing Perfect Forward Secrecy (PFS) via Ephemeral Diffie-Hellman key exchange.
+## Incident Response Considerations
 
----
+- Revoke compromised certificates immediately via CRL and OCSP updates.
+- Rotate all keys and certificates if private key material is exposed.
+- Assess scope of data intercepted if weak encryption was used during the compromise window.
+- Re-issue certificates from a clean CA chain after root or intermediate CA compromise.
+- Document cryptographic failures for regulatory breach notification requirements.
 
-## 4. Post-Quantum Cryptography (PQC)
+## Framework References
 
-Quantum computers using Shor's algorithm threaten legacy RSA/ECC asymmetric encryption. Organizations are preparing for migration to NIST-standardized Post-Quantum algorithms (e.g., CRYSTALS-Kyber, CRYSTALS-Dilithium).
+- NIST FIPS 140-3 (Cryptographic Module Validation)
+- NIST Post-Quantum Cryptography Standards
+- X.509 Certificate Standard (RFC 5280)
+- TLS 1.3 Specification (RFC 8446)

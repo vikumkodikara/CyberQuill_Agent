@@ -140,10 +140,17 @@ if run_clicked:
         # Stage 6: Review
         progress_bar.progress(stages[5][1], text=stages[5][0])
         from agents.reviewer import review_articles
-        reviews = review_articles(magazine_articles)
+        reviews = review_articles(
+            magazine_articles,
+            rag_contexts=[e.rag_context for e in enriched],
+        )
         approved = sum(1 for r in reviews if r.approved)
         avg_score = sum(r.quality_score for r in reviews) / len(reviews) if reviews else 0
-        status_box.success(f"📝 Quality review passed — {approved} articles approved")
+        avg_rag = sum(r.rag_fidelity_score for r in reviews) / len(reviews) if reviews else 0
+        status_box.success(
+            f"📝 Quality review passed — {approved} articles approved "
+            f"(avg RAG fidelity: {avg_rag:.1f}/10)"
+        )
 
         # Stage 7: PDF
         progress_bar.progress(stages[6][1], text=stages[6][0])
@@ -163,6 +170,7 @@ if run_clicked:
             "magazine_count": len(magazine_articles),
             "approved_count": approved,
             "avg_score": avg_score,
+            "avg_rag_score": avg_rag,
             "pdf_path": pdf_path,
             "categories": cats,
             "magazine_articles": magazine_articles,
@@ -260,6 +268,23 @@ if "pipeline_result" in st.session_state:
         """, unsafe_allow_html=True)
 
         with st.expander(f"📖 Read Full Article: {display_art.title}"):
+            if rev:
+                rag_color = "#00FF88" if rev.rag_fidelity_score >= 6 else "#FF3366"
+                st.markdown(
+                    f"**Editorial Score:** {rev.quality_score}/10 &nbsp;|&nbsp; "
+                    f"**RAG Fidelity:** <span style='color:{rag_color}'>{rev.rag_fidelity_score}/10</span> &nbsp;|&nbsp; "
+                    f"**Approved:** {'✅' if rev.approved else '❌'}",
+                    unsafe_allow_html=True,
+                )
+                if rev.rag_issues:
+                    st.markdown("**RAG Issues:**")
+                    for issue in rev.rag_issues:
+                        st.markdown(f"- {issue}")
+                if rev.issues:
+                    st.markdown("**Editorial Issues:**")
+                    for issue in rev.issues:
+                        st.markdown(f"- {issue}")
+                st.markdown("---")
             if display_art.executive_summary:
                 st.markdown("### Executive Summary")
                 st.markdown(display_art.executive_summary)

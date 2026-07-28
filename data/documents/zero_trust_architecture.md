@@ -1,32 +1,51 @@
+---
+title: Zero Trust Architecture
+categories: [Cloud Security, Data Breach]
+keywords: [zero trust, ZTA, micro-segmentation, NIST 800-207, least privilege, identity]
+frameworks: [NIST SP 800-207, CISA Zero Trust Maturity Model, Forrester ZT]
+---
+
 # Zero Trust Architecture (ZTA)
 
-## 1. Core Philosophy
+## Overview
 
-**Zero Trust** is a strategic cybersecurity paradigm operating on the fundamental mandate: **"Never Trust, Always Verify."** Unlike traditional perimeter-based security ("castle-and-moat"), Zero Trust assumes that threats exist both outside and inside the network boundary.
+Zero Trust Architecture eliminates implicit trust within networks by requiring continuous verification of every user, device, and application attempting to access resources. Based on NIST SP 800-207, ZTA assumes breach and enforces least-privilege access with micro-segmentation, strong identity verification, and continuous monitoring.
 
----
+## Key Concepts & Attack Vectors
 
-## 2. Fundamental Pillars of Zero Trust (NIST SP 800-207)
+- **Never Trust, Always Verify**: Every access request is authenticated and authorized regardless of network location.
+- **Micro-Segmentation**: Dividing networks into small zones with granular access controls between segments.
+- **Identity-Centric Security**: User and device identity becomes the primary security perimeter.
+- **Continuous Monitoring**: Real-time assessment of device health, user behavior, and session risk.
+- **Lateral Movement Prevention**: Limiting blast radius by restricting east-west traffic between network segments.
 
-1. **Continuous Identity Verification**: Authenticate and authorize every access request dynamically using Multi-Factor Authentication (MFA) and risk-based context.
-2. **Explicit Authorization**: Evaluate device health, user context, geographical location, and resource sensitivity before granting access.
-3. **Least Privilege Access (JIT/JEA)**: Provide Just-In-Time (JIT) and Just-Enough-Access (JEA) to minimize the attack surface.
-4. **Micro-segmentation**: Divide networks into isolated security zones to restrict lateral movement during a breach.
-5. **Assume Breach**: Operate with the mindset that attackers are already present in the environment; encrypt all internal traffic (mTLS) and log all activity.
+## Detection & Indicators
 
----
+- Monitor for policy violations where users access resources outside their authorized segments.
+- Detect devices failing health checks (missing patches, disabled EDR, jailbroken status).
+- Alert on anomalous access patterns inconsistent with user behavioral baselines.
+- Track failed authentication attempts and privilege escalation across segmented zones.
+- Identify shadow IT applications bypassing zero trust access proxies.
 
-## 3. Key Components of ZTA Implementation
+## Mitigation & Best Practices
 
-- **Policy Engine (PE)**: Evaluates access requests against enterprise security policies.
-- **Policy Administrator (PA)**: Communicates with the Policy Enforcement Point (PEP) to issue session tokens or access credentials.
-- **Policy Enforcement Point (PEP)**: Intercepts, inspects, and terminates connections between users and enterprise resources.
-- **Software-Defined Perimeter (SDP)**: Hides infrastructure assets from public view, rendering services invisible until authenticated.
+- **Identity Provider Integration**: Centralize authentication via enterprise IdP with conditional access policies.
+- **Software-Defined Perimeter**: Implement ZTNA solutions replacing traditional VPN with application-level access.
+- **Device Posture Assessment**: Verify device compliance (patch level, encryption, EDR status) before granting access.
+- **Least Privilege Access**: Grant just-in-time, just-enough access with automatic session expiration.
+- **Encrypted Micro-Tunnels**: Use encrypted tunnels between segments instead of flat network architectures.
 
----
+## Incident Response Considerations
 
-## 4. Operational Benefits
+- Revoke all active sessions and re-authenticate users during active breach containment.
+- Tighten micro-segmentation policies to isolate compromised segments immediately.
+- Use zero trust logs for precise attribution of which identities accessed compromised resources.
+- Implement emergency access procedures that maintain zero trust principles during IR.
+- Update access policies based on attack paths discovered during incident investigation.
 
-- Eliminates implicit trust based on network location (LAN vs. Internet).
-- Drastically limits blast radius during ransomware outbreaks or credential theft.
-- Enables secure remote workforce access without legacy VPN vulnerabilities.
+## Framework References
+
+- NIST SP 800-207 (Zero Trust Architecture)
+- CISA Zero Trust Maturity Model v2.0
+- NIST SP 800-53 Access Control Family
+- Forrester Zero Trust Extended (ZTX) Framework
