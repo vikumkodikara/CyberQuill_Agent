@@ -1,31 +1,56 @@
+---
+title: OWASP Top 10 Web Application Security Risks
+categories: [Vulnerability Management, Data Breach]
+keywords: [OWASP, web security, injection, XSS, access control, SSRF, misconfiguration]
+frameworks: [OWASP Top 10 2021, CWE, ASVS]
+---
+
 # OWASP Top 10 Web Application Security Risks (2021)
 
-## A01:2021 – Broken Access Control
-Access control enforces policy such that users cannot act outside of their intended permissions. Failures typically lead to unauthorized information disclosure, modification, or destruction of data, or performing a business function outside the user's limits. Common vulnerabilities include violation of the principle of least privilege, bypassing access control checks by modifying the URL, internal application state, or the HTML page, permitting viewing or editing someone else's account, elevation of privilege, and CORS misconfiguration.
+## Overview
 
-## A02:2021 – Cryptographic Failures
-Previously known as Sensitive Data Exposure, this category focuses on failures related to cryptography which often lead to exposure of sensitive data. Notable CWEs include use of hard-coded password, broken or risky crypto algorithm, and insufficient entropy. Organizations should classify data processed, stored, or transmitted by an application. Identify which data is sensitive according to privacy laws, regulatory requirements, or business needs. Ensure that sensitive data is encrypted at rest and in transit.
+The OWASP Top 10 represents the most critical security risks to web applications, updated periodically based on data from security testing organizations worldwide. Organizations should use this list to prioritize web application security testing, developer training, and secure coding standards.
 
-## A03:2021 – Injection
-An application is vulnerable to injection when user-supplied data is not validated, filtered, or sanitized by the application. SQL injection, NoSQL injection, OS command injection, LDAP injection, and Cross-Site Scripting (XSS) are common injection flaws. Preventive measures include using safe APIs which avoid using the interpreter entirely, using positive server-side input validation, and escaping special characters.
+## Key Concepts & Attack Vectors
 
-## A04:2021 – Insecure Design
-Insecure design is a broad category representing different weaknesses, expressed as missing or ineffective control design. An insecure design cannot be fixed by a perfect implementation as by definition, needed security controls were never created to defend against specific attacks. Organizations should establish and use a secure development lifecycle with AppSec professionals to help evaluate and design security and privacy-related controls.
+- **A01: Broken Access Control** — Users acting outside intended permissions via URL manipulation, IDOR, or CORS misconfiguration.
+- **A02: Cryptographic Failures** — Exposure of sensitive data due to weak or missing encryption at rest and in transit.
+- **A03: Injection** — SQL, NoSQL, OS command, LDAP injection, and Cross-Site Scripting (XSS) via unsanitized user input.
+- **A04: Insecure Design** — Missing security controls in application architecture that cannot be fixed by implementation alone.
+- **A05: Security Misconfiguration** — Default credentials, verbose errors, unnecessary features, and insecure cloud settings.
+- **A06: Vulnerable Components** — Using libraries and frameworks with known CVEs without timely patching.
+- **A07: Authentication Failures** — Weak passwords, missing MFA, and broken session management.
+- **A08: Software Integrity Failures** — Insecure CI/CD pipelines and untrusted plugins or CDN content.
+- **A09: Logging & Monitoring Failures** — Inability to detect, investigate, and respond to active breaches.
+- **A10: Server-Side Request Forgery (SSRF)** — Application fetching remote resources from attacker-controlled URLs.
 
-## A05:2021 – Security Misconfiguration
-The application might be vulnerable if the application is missing appropriate security hardening across any part of the application stack or improperly configured permissions on cloud services. Default accounts and their passwords are still enabled and unchanged. Error handling reveals stack traces or other overly informative error messages to users. For upgraded systems, the latest security features are disabled or not configured securely.
+## Detection & Indicators
 
-## A06:2021 – Vulnerable and Outdated Components
-Components such as libraries, frameworks, and other software modules run with the same privileges as the application. If a vulnerable component is exploited, such an attack can facilitate serious data loss or server takeover. Applications and APIs using components with known vulnerabilities may undermine application defenses and enable various attacks and impacts. Organizations should remove unused dependencies, unnecessary features, components, files, and documentation.
+- Web application firewall alerts for injection attempts, XSS payloads, and path traversal.
+- DAST scan findings mapping to OWASP Top 10 categories during security testing.
+- Access control testing revealing horizontal and vertical privilege escalation.
+- Dependency scanning reports listing vulnerable third-party components.
+- Authentication logs showing brute force attempts and session fixation indicators.
 
-## A07:2021 – Identification and Authentication Failures
-Confirmation of the user's identity, authentication, and session management is critical to protect against authentication-related attacks. Application security weaknesses include permitting brute force or other automated attacks, permitting default, weak, or well-known passwords, using weak or ineffective credential recovery and forgot-password processes, and missing or ineffective multi-factor authentication.
+## Mitigation & Best Practices
 
-## A08:2021 – Software and Data Integrity Failures
-Software and data integrity failures relate to code and infrastructure that does not protect against integrity violations. An example of this is where an application relies upon plugins, libraries, or modules from untrusted sources, repositories, and content delivery networks (CDNs). An insecure CI/CD pipeline can introduce the potential for unauthorized access, malicious code, or system compromise.
+- **Secure SDLC**: Integrate security requirements and threat modeling into design phase (addresses A04).
+- **Input Validation**: Use parameterized queries, output encoding, and positive server-side validation (addresses A03).
+- **Access Control Testing**: Verify authorization on every endpoint, not just authentication (addresses A01).
+- **Component Management**: Maintain software bill of materials (SBOM) and automate dependency updates (addresses A06).
+- **Security Headers**: Implement CSP, HSTS, X-Frame-Options, and secure cookie attributes.
 
-## A09:2021 – Security Logging and Monitoring Failures
-This category is to help detect, escalate, and respond to active breaches. Without logging and monitoring, breaches cannot be detected. Insufficient logging, detection, monitoring, and active response occurs any time auditable events such as logins, failed logins, and high-value transactions are not logged, warnings and errors generate no or inadequate log messages, and logs are only stored locally.
+## Incident Response Considerations
 
-## A10:2021 – Server-Side Request Forgery (SSRF)
-SSRF flaws occur whenever a web application is fetching a remote resource without validating the user-supplied URL. It allows an attacker to coerce the application to send a crafted request to an unexpected destination, even when protected by a firewall, VPN, or another type of network access control list (ACL). SSRF attacks can be used to scan internal networks, access internal services, and read local files.
+- Identify which OWASP category the exploited vulnerability falls under for root cause analysis.
+- Patch or deploy WAF rules for the specific vulnerability class immediately.
+- Assess data exposure scope for injection and access control breach incidents.
+- Review application logs for evidence of prior exploitation attempts.
+- Update secure coding training to address the vulnerability class that was exploited.
+
+## Framework References
+
+- OWASP Top 10 Web Application Security Risks (2021)
+- OWASP Application Security Verification Standard (ASVS)
+- CWE/SANS Top 25 Most Dangerous Software Weaknesses
+- OWASP Testing Guide v4.2

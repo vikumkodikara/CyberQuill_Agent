@@ -58,12 +58,14 @@ Possible improvements:
 
 import re
 
-from config.prompts import WRITER_PROMPT
+from config.prompts import WRITER_PROMPT, WRITER_REVISION_PROMPT
 from config.settings import settings
-from models.schemas import EnrichedArticle, MagazineArticle
+from models.schemas import EnrichedArticle, MagazineArticle, ReviewResult
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+RAG_CONTEXT_MAX_CHARS = 3000
 
 
 def _write_by_template(article: EnrichedArticle) -> MagazineArticle:
@@ -100,10 +102,11 @@ def _write_by_template(article: EnrichedArticle) -> MagazineArticle:
 
     # Background section from RAG context
     if article.rag_context:
+        context_text = article.rag_context[:RAG_CONTEXT_MAX_CHARS]
         background = (
             f"According to cybersecurity frameworks and knowledge bases, "
             f"this type of threat is well-documented:\n\n"
-            f"{article.rag_context[:800]}"
+            f"{context_text}"
         )
     else:
         background = (
@@ -233,6 +236,98 @@ def _extract_section(sections: dict[str, str], *keywords: str) -> str:
     return ""
 
 
+def _magazine_to_text(article: MagazineArticle) -> str:
+    """Formats a MagazineArticle as markdown for revision prompts."""
+    return (
+        f"# {article.title}\n\n"
+        f"## Executive Summary\n{article.executive_summary}\n\n"
+        f"## Background\n{article.background}\n\n"
+        f"## Technical Analysis\n{article.technical_analysis}\n\n"
+        f"## Impact\n{article.impact}\n\n"
+        f"## Recommendations\n{article.recommendations}\n\n"
+        f"## References\n{article.references}"
+    )
+
+
+def _build_magazine_from_sections(
+    sections: dict[str, str],
+    raw_text: str,
+    article: EnrichedArticle,
+    fallback_title: str = "",
+) -> MagazineArticle:
+    """Builds a MagazineArticle from parsed LLM section dict."""
+    generated_title = _extract_section(sections, "title")
+    if not generated_title:
+        first_line = raw_text.split("\n")[0].strip("# *")
+        generated_title = (
+            first_line if len(first_line) < 200 else (fallback_title or article.title)
+        )
+
+    return MagazineArticle(
+        title=generated_title or article.title,
+        executive_summary=_extract_section(
+            sections, "executive summary", "summary", "overview"
+        ),
+        background=_extract_section(
+            sections, "background", "context", "history"
+        ),
+        technical_analysis=_extract_section(
+            sections, "technical analysis", "analysis", "technical", "details"
+        ),
+        impact=_extract_section(
+            sections, "impact", "affected", "consequences", "impact assessment"
+        ),
+        recommendations=_extract_section(
+            sections, "recommendations", "mitigation", "remediation", "action"
+        ),
+        references=_extract_section(
+            sections, "references", "sources", "further reading"
+        ),
+        original_link=article.link,
+        category=article.category,
+    )
+
+
+def _write_revision_by_llm(
+    article: EnrichedArticle,
+    previous_article: MagazineArticle,
+    review_result: ReviewResult,
+) -> MagazineArticle:
+    """Revises a magazine article using LLM with review feedback and RAG context."""
+    from langchain_groq import ChatGroq
+
+    llm = ChatGroq(
+        api_key=settings.GROQ_API_KEY,
+        model=settings.GROQ_MODEL,
+        temperature=0.5,
+        max_tokens=2500,
+    )
+
+    all_issues = review_result.issues + review_result.rag_issues
+    issues_text = "\n".join(f"- {issue}" for issue in all_issues) or "Improve overall quality."
+
+    rag_context = (article.rag_context or "No additional context available.")[
+        :RAG_CONTEXT_MAX_CHARS
+    ]
+
+    prompt = WRITER_REVISION_PROMPT.format(
+        title=article.title,
+        summary=article.summary,
+        source=article.source,
+        rag_context=rag_context,
+        previous_article=_magazine_to_text(previous_article),
+        review_issues=issues_text,
+    )
+
+    response = llm.invoke(prompt)
+    raw_text = response.content.strip()
+    sections = _parse_llm_sections(raw_text)
+
+    return _build_magazine_from_sections(
+        sections, raw_text, article, fallback_title=previous_article.title
+    )
+
+
 def _write_by_llm(article: EnrichedArticle) -> MagazineArticle:
     """
     Generates a magazine article using the Groq LLM (primary method).
@@ -266,7 +361,9 @@ def _write_by_llm(article: EnrichedArticle) -> MagazineArticle:
         title=article.title,
         summary=article.summary,
         source=article.source,
-        rag_context=article.rag_context or "No additional context available.",
+        rag_context=(article.rag_context or "No additional context available.")[
+            :RAG_CONTEXT_MAX_CHARS
+        ],
     )
 
     # Call the LLM
@@ -278,65 +375,34 @@ def _write_by_llm(article: EnrichedArticle) -> MagazineArticle:
     # Parse the response into sections
     sections = _parse_llm_sections(raw_text)
 
-    # Extract the title (first line or heading)
-    generated_title = _extract_section(sections, "title")
-    if not generated_title:
-        # Try to extract from the first line
-        first_line = raw_text.split("\n")[0].strip("# *")
-        generated_title = first_line if len(first_line) < 200 else article.title
-
-    return MagazineArticle(
-        title=generated_title or article.title,
-        executive_summary=_extract_section(
-            sections, "executive summary", "summary", "overview"
-        ),
-        background=_extract_section(
-            sections, "background", "context", "history"
-        ),
-        technical_analysis=_extract_section(
-            sections, "technical analysis", "analysis", "technical", "details"
-        ),
-        impact=_extract_section(
-            sections, "impact", "affected", "consequences"
-        ),
-        recommendations=_extract_section(
-            sections, "recommendations", "mitigation", "remediation", "action"
-        ),
-        references=_extract_section(
-            sections, "references", "sources", "further reading"
-        ),
-        original_link=article.link,
-        category=article.category,
-    )
+    return _build_magazine_from_sections(sections, raw_text, article)
 
 
-def write_article(article: EnrichedArticle) -> MagazineArticle:
+def write_article(
+    article: EnrichedArticle,
+    previous_article: MagazineArticle | None = None,
+    review_result: ReviewResult | None = None,
+) -> MagazineArticle:
     """
     Writes a magazine article from an enriched article.
 
-    Strategy:
-        1. Try LLM writing (if API key is available)
-        2. Fall back to template writing (if LLM fails)
-
-    This is the same graceful degradation pattern used in the
-    Classification Agent.
-
-    Args:
-        article: An EnrichedArticle to transform
-
-    Returns:
-        A MagazineArticle ready for review
+    When previous_article and review_result are provided, performs a
+    revision pass using editorial feedback and RAG context.
     """
-    # Try LLM writing first
+    is_revision = previous_article is not None and review_result is not None
+
     if settings.GROQ_API_KEY and settings.GROQ_API_KEY != "your_groq_api_key_here":
         try:
-            result = _write_by_llm(article)
-            logger.debug(f"LLM wrote article: '{result.title[:50]}...'")
+            if is_revision:
+                result = _write_revision_by_llm(article, previous_article, review_result)
+                logger.debug(f"LLM revised article: '{result.title[:50]}...'")
+            else:
+                result = _write_by_llm(article)
+                logger.debug(f"LLM wrote article: '{result.title[:50]}...'")
             return result
         except Exception as e:
             logger.warning(f"LLM writing failed: {e}. Using template fallback.")
 
-    # Fallback: template-based writing
     result = _write_by_template(article)
     logger.debug(f"Template wrote article: '{result.title[:50]}...'")
     return result
@@ -344,6 +410,8 @@ def write_article(article: EnrichedArticle) -> MagazineArticle:
 
 def write_articles(
     articles: list[EnrichedArticle],
+    previous_articles: list[MagazineArticle] | None = None,
+    review_results: list[ReviewResult] | None = None,
 ) -> list[MagazineArticle]:
     """
     Writes magazine articles for a list of enriched articles.
@@ -377,8 +445,10 @@ def write_articles(
     logger.info(f"Writing method: {method}")
 
     magazine_articles = []
-    for article in articles:
-        mag_article = write_article(article)
+    for i, article in enumerate(articles):
+        prev = previous_articles[i] if previous_articles and i < len(previous_articles) else None
+        review = review_results[i] if review_results and i < len(review_results) else None
+        mag_article = write_article(article, previous_article=prev, review_result=review)
         magazine_articles.append(mag_article)
 
     logger.info(
@@ -411,7 +481,21 @@ def writer_node(state: dict) -> dict:
     logger.info("Writer Agent starting...")
 
     enriched_articles = state.get("enriched_articles", [])
-    magazine_articles = write_articles(enriched_articles)
+    revision_count = state.get("revision_count", 0)
+    review_results = state.get("review_results", [])
+    previous_articles = state.get("magazine_articles", [])
+
+    is_revision = revision_count > 0 and review_results and previous_articles
+
+    if is_revision:
+        logger.info(f"Revision cycle {revision_count}: revising articles with review feedback.")
+        magazine_articles = write_articles(
+            enriched_articles,
+            previous_articles=previous_articles,
+            review_results=review_results,
+        )
+    else:
+        magazine_articles = write_articles(enriched_articles)
 
     logger.info(
         f"Writer Agent finished. Generated {len(magazine_articles)} articles."

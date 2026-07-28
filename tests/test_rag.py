@@ -31,9 +31,12 @@ import pytest
 from agents.rag import (
     CHUNK_OVERLAP,
     CHUNK_SIZE,
+    CATEGORY_SOURCE_MAP,
+    _chunk_by_sections,
     _chunk_documents,
     _chunk_text,
     _load_documents,
+    _parse_frontmatter,
     build_knowledge_base,
     retrieve_context,
     enrich_article,
@@ -58,6 +61,12 @@ def sample_docs_dir(tmp_path):
     # Create sample document 1
     doc1 = tmp_path / "test_owasp.md"
     doc1.write_text(
+        "---\n"
+        "title: OWASP Top 10\n"
+        "categories: [Vulnerability Management]\n"
+        "keywords: [owasp, injection, sql]\n"
+        "frameworks: [OWASP]\n"
+        "---\n\n"
         "# OWASP Top 10\n\n"
         "## SQL Injection\n"
         "SQL injection is a code injection technique that might destroy "
@@ -72,9 +81,14 @@ def sample_docs_dir(tmp_path):
         encoding="utf-8",
     )
 
-    # Create sample document 2
     doc2 = tmp_path / "test_nist.md"
     doc2.write_text(
+        "---\n"
+        "title: NIST Cybersecurity Framework\n"
+        "categories: [Data Breach]\n"
+        "keywords: [nist, framework, respond]\n"
+        "frameworks: [NIST CSF]\n"
+        "---\n\n"
         "# NIST Cybersecurity Framework\n\n"
         "## Identify\n"
         "Develop an organizational understanding to manage cybersecurity "
@@ -87,6 +101,9 @@ def sample_docs_dir(tmp_path):
         "occurrence of a cybersecurity event.",
         encoding="utf-8",
     )
+
+    readme = tmp_path / "README.md"
+    readme.write_text("# Index\n\nThis should be excluded.", encoding="utf-8")
 
     # Create a non-markdown file (should be skipped)
     ignored = tmp_path / "readme.json"
@@ -111,9 +128,15 @@ class TestLoadDocuments:
     """Tests for document loading."""
 
     def test_loads_markdown_files(self, sample_docs_dir):
-        """Should load .md files from the directory."""
+        """Should load .md files with frontmatter from the directory."""
         docs = _load_documents(sample_docs_dir)
-        assert len(docs) == 2  # 2 .md files, 1 .json ignored
+        assert len(docs) == 2  # 2 knowledge files, README and json ignored
+
+    def test_excludes_readme(self, sample_docs_dir):
+        """Should exclude README.md from indexing."""
+        docs = _load_documents(sample_docs_dir)
+        filenames = [d["filename"] for d in docs]
+        assert "README.md" not in filenames
 
     def test_skips_non_markdown_files(self, sample_docs_dir):
         """Should ignore files that are not .md or .txt."""
@@ -122,11 +145,13 @@ class TestLoadDocuments:
         assert "readme.json" not in filenames
 
     def test_returns_filename_and_content(self, sample_docs_dir):
-        """Each document should have filename and content fields."""
+        """Each document should have filename, content, and frontmatter."""
         docs = _load_documents(sample_docs_dir)
         for doc in docs:
             assert "filename" in doc
             assert "content" in doc
+            assert "frontmatter" in doc
+            assert doc["frontmatter"].get("title")
             assert len(doc["content"]) > 0
 
     def test_handles_missing_directory(self):
@@ -138,6 +163,81 @@ class TestLoadDocuments:
         """Should return empty list for directory with no documents."""
         docs = _load_documents(tmp_path)
         assert docs == []
+
+
+# ============================================
+# Tests for _parse_frontmatter()
+# ============================================
+
+class TestParseFrontmatter:
+    """Tests for YAML frontmatter parsing."""
+
+    def test_parses_title_and_lists(self):
+        content = (
+            "---\n"
+            "title: Test Topic\n"
+            "categories: [Malware, Threat Intelligence]\n"
+            "keywords: [ransomware, encryption]\n"
+            "---\n\n"
+            "# Body\n\nSome content."
+        )
+        meta, body = _parse_frontmatter(content)
+        assert meta["title"] == "Test Topic"
+        assert "Malware" in meta["categories"]
+        assert "ransomware" in meta["keywords"]
+        assert "# Body" in body
+
+    def test_no_frontmatter(self):
+        content = "# Just markdown\n\nNo frontmatter here."
+        meta, body = _parse_frontmatter(content)
+        assert meta == {}
+        assert body == content
+
+
+# ============================================
+# Tests for _chunk_by_sections()
+# ============================================
+
+class TestChunkBySections:
+    """Tests for heading-aware chunking."""
+
+    def test_splits_on_headings(self):
+        text = (
+            "# Title\n\n"
+            "## Section One\n"
+            "Content for section one about SQL injection.\n\n"
+            "## Section Two\n"
+            "Content for section two about mitigation."
+        )
+        chunks = _chunk_by_sections(text, chunk_size=500)
+        assert len(chunks) >= 2
+        section_names = [name for name, _ in chunks]
+        assert any("Section One" in name for name in section_names)
+
+    def test_metadata_contains_section(self, sample_docs_dir):
+        """Each chunk metadata should include section name."""
+        docs = _load_documents(sample_docs_dir)
+        chunks, metadata = _chunk_documents(docs)
+        assert any(m.get("section") for m in metadata)
+        assert any(m.get("categories") for m in metadata)
+
+
+# ============================================
+# Tests for CATEGORY_SOURCE_MAP
+# ============================================
+
+class TestCategorySourceMap:
+    """Tests for category-to-source mapping."""
+
+    def test_all_categories_have_sources(self):
+        assert "Malware" in CATEGORY_SOURCE_MAP
+        assert "AI Security" in CATEGORY_SOURCE_MAP
+        assert len(CATEGORY_SOURCE_MAP) == 7
+
+    def test_sources_are_md_files(self):
+        for sources in CATEGORY_SOURCE_MAP.values():
+            for source in sources:
+                assert source.endswith(".md")
 
 
 # ============================================
@@ -213,6 +313,7 @@ class TestChunkDocuments:
         for meta in metadata:
             assert "source" in meta
             assert meta["source"].endswith(".md")
+            assert "section" in meta
 
 
 # ============================================
@@ -390,8 +491,8 @@ class TestEnrichArticle:
             persist_dir=chroma_dir,
         )
 
-    def test_enriches_article(self):
-        """Should add RAG context to the article."""
+    def test_enriches_with_category_query(self):
+        """Should use category in enrichment query."""
         article = ClassifiedArticle(
             title="SQL Injection Vulnerability Found in Popular CMS",
             link="https://example.com/sqli",
@@ -405,6 +506,5 @@ class TestEnrichArticle:
 
         assert enriched.rag_context != ""
         assert len(enriched.rag_sources) > 0
-        # Original fields should be preserved
         assert enriched.title == article.title
         assert enriched.category == article.category

@@ -5,66 +5,10 @@ CyberQuill Reviewer Agent
 Purpose:
     Reviews magazine articles for quality, completeness, and accuracy.
     Acts as an automated "editor" that checks articles before publication.
-
-What is the Reflection Pattern?
-    Reflection is an agentic AI design pattern where the agent:
-    1. Produces output (or receives output from another agent)
-    2. Critiques its own output (self-review)
-    3. Revises the output based on the critique
-    4. Repeats until satisfied or max iterations reached
-
-    In CyberQuill, the flow is:
-        Writer Agent → MagazineArticle
-                            ↓
-        Reviewer Agent → Reviews article (score 1-10)
-                            ↓
-        If score < 7:  → Send back to Writer for revision (max 2 cycles)
-        If score >= 7: → Approved for PDF generation
-
-    Why limit to 2 revision cycles?
-        - Prevents infinite loops
-        - LLMs can "overthink" and make articles worse after too many revisions
-        - 2 cycles is enough to fix most quality issues
-
-How it works:
-    Mode 1: LLM-based (primary)
-        - Sends article to Groq LLM with REVIEWER_PROMPT
-        - LLM scores the article and identifies issues
-        - LLM may provide a revised version
-        - High-quality reviews, requires API key
-
-    Mode 2: Rule-based (fallback)
-        - Checks article structure (are all sections present?)
-        - Checks minimum lengths for each section
-        - Assigns a score based on completeness
-        - Always works, no API needed
-
-Inputs:
-    - List[MagazineArticle] — articles from the Writer Agent
-
-Outputs:
-    - List[ReviewResult] — review scores, issues, and revised articles
-
-Dependencies:
-    - langchain-groq: LLM calls for review
-    - config.settings: API keys, model configuration
-    - config.prompts: REVIEWER_PROMPT, REVIEWER_REFLECTION_PROMPT
-    - models.schemas: MagazineArticle, ReviewResult
-    - utils.logger: Logging
-
-Testing strategy:
-    - Test rule-based review (no API needed)
-    - Test with complete articles → should score high
-    - Test with incomplete articles → should score low and flag issues
-    - Test the reflection cycle (mock Writer revisions)
-    - Edge cases (empty article, all sections empty)
-
-Possible improvements:
-    - Add fact-checking against RAG knowledge base
-    - Implement style scoring (readability, tone consistency)
-    - Add plagiarism detection
-    - Track review history for analytics
+    Now includes RAG-grounded verification against the knowledge base.
 """
+
+import re
 
 from config.prompts import REVIEWER_PROMPT
 from config.settings import settings
@@ -73,18 +17,10 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# ============================================
-# Configuration
-# ============================================
-
-# Minimum score for approval (articles scoring below this are flagged)
 APPROVAL_THRESHOLD = 7
-
-# Maximum number of revision cycles
+RAG_FIDELITY_THRESHOLD = 6
 MAX_REVISIONS = 2
 
-# Minimum word count for each section to be considered "complete"
-# These are intentionally low — they check for PRESENCE, not quality
 MIN_SECTION_WORDS = {
     "executive_summary": 10,
     "background": 15,
@@ -95,38 +31,66 @@ MIN_SECTION_WORDS = {
 }
 
 
-def _review_by_rules(article: MagazineArticle) -> ReviewResult:
+def _compute_rag_fidelity(
+    article: MagazineArticle,
+    rag_context: str,
+) -> tuple[int, list[str]]:
     """
-    Reviews an article using rule-based checks (fallback method).
+    Rule-based RAG fidelity scoring via keyword overlap.
 
-    How scoring works:
-        Start with a base score of 10 (perfect).
-        Deduct points for each issue found:
-        - Missing section: -2 points
-        - Section too short: -1 point
-        - Missing title: -3 points
-
-    Why rule-based?
-        - Works without any API
-        - Fast and deterministic (same input → same output)
-        - Easy to explain in a viva
-        - Good enough for testing the pipeline
-
-    Args:
-        article: A MagazineArticle to review
-
-    Returns:
-        A ReviewResult with score, issues, and approval status
+    Compares article text against RAG context keywords.
     """
+    if not rag_context.strip():
+        return 10, []
+
+    article_text = _format_article_for_review(article).lower()
+    rag_lower = rag_context.lower()
+
+    rag_words = {
+        word
+        for word in re.findall(r"[a-z]{4,}", rag_lower)
+        if word not in {"that", "this", "with", "from", "have", "been", "will"}
+    }
+
+    if not rag_words:
+        return 10, []
+
+    overlap = sum(1 for word in rag_words if word in article_text)
+    overlap_ratio = overlap / len(rag_words)
+
+    if overlap_ratio >= 0.15:
+        score = 10
+    elif overlap_ratio >= 0.10:
+        score = 8
+    elif overlap_ratio >= 0.05:
+        score = 6
+    elif overlap_ratio >= 0.02:
+        score = 4
+    else:
+        score = 2
+
     issues = []
-    score = 10  # Start perfect, deduct for problems
+    if score < RAG_FIDELITY_THRESHOLD:
+        issues.append(
+            "Article has low alignment with knowledge base context "
+            f"(overlap: {overlap_ratio:.1%})"
+        )
 
-    # Check 1: Title must exist
+    return score, issues
+
+
+def _review_by_rules(
+    article: MagazineArticle,
+    rag_context: str = "",
+) -> ReviewResult:
+    """Reviews an article using rule-based checks (fallback method)."""
+    issues = []
+    score = 10
+
     if not article.title or len(article.title.strip()) < 5:
         issues.append("Missing or too short title")
         score -= 3
 
-    # Check 2: Each section must exist and meet minimum word count
     sections_to_check = {
         "Executive Summary": (article.executive_summary, MIN_SECTION_WORDS["executive_summary"]),
         "Background": (article.background, MIN_SECTION_WORDS["background"]),
@@ -147,14 +111,17 @@ def _review_by_rules(article: MagazineArticle) -> ReviewResult:
             )
             score -= 1
 
-    # Clamp score to valid range [1, 10]
     score = max(1, min(10, score))
 
-    approved = score >= APPROVAL_THRESHOLD
+    rag_fidelity_score, rag_issues = _compute_rag_fidelity(article, rag_context)
+    approved = (
+        score >= APPROVAL_THRESHOLD
+        and rag_fidelity_score >= RAG_FIDELITY_THRESHOLD
+    )
 
     review_notes = "Rule-based review completed. "
     if approved:
-        review_notes += "Article meets quality standards."
+        review_notes += "Article meets quality and RAG fidelity standards."
     else:
         review_notes += f"Article needs improvement. {len(issues)} issue(s) found."
 
@@ -162,26 +129,15 @@ def _review_by_rules(article: MagazineArticle) -> ReviewResult:
         quality_score=score,
         approved=approved,
         issues=issues,
-        revised_article=None,  # Rule-based review doesn't revise
+        revised_article=None,
         review_notes=review_notes,
+        rag_fidelity_score=rag_fidelity_score,
+        rag_issues=rag_issues,
     )
 
 
 def _format_article_for_review(article: MagazineArticle) -> str:
-    """
-    Formats a MagazineArticle as a readable string for LLM review.
-
-    Why format as a string?
-        The LLM prompt expects a single block of text, not a JSON object.
-        This function creates a nicely formatted markdown version that the
-        LLM can read and critique.
-
-    Args:
-        article: The MagazineArticle to format
-
-    Returns:
-        A formatted markdown string
-    """
+    """Formats a MagazineArticle as a readable string for LLM review."""
     return (
         f"# {article.title}\n\n"
         f"## Executive Summary\n{article.executive_summary}\n\n"
@@ -194,52 +150,54 @@ def _format_article_for_review(article: MagazineArticle) -> str:
 
 
 def _parse_review_response(text: str) -> ReviewResult:
-    """
-    Parses the LLM's review response into a ReviewResult.
-
-    The LLM is prompted to respond in this format:
-        - **Quality Score**: [1-10]
-        - **Approved**: [YES/NO]
-        - **Issues Found**: [list]
-        - **Revised Article**: [text]
-
-    This function extracts each field using string matching.
-
-    Args:
-        text: The raw LLM review response
-
-    Returns:
-        A ReviewResult parsed from the response
-    """
-    import re
-
-    # Extract quality score
-    # Handles both "Quality Score: 9" and "**Quality Score**: 9"
+    """Parses the LLM's review response into a ReviewResult."""
     score_match = re.search(r"\**Quality Score\**[:\s]*(\d+)", text, re.IGNORECASE)
     score = int(score_match.group(1)) if score_match else 5
     score = max(1, min(10, score))
 
-    # Extract approved status
-    approved_match = re.search(r"\**Approved\**[:\s]*(YES|NO)", text, re.IGNORECASE)
-    approved = approved_match.group(1).upper() == "YES" if approved_match else (score >= APPROVAL_THRESHOLD)
+    rag_match = re.search(
+        r"\**RAG Fidelity Score\**[:\s]*(\d+)", text, re.IGNORECASE
+    )
+    rag_fidelity_score = int(rag_match.group(1)) if rag_match else score
+    rag_fidelity_score = max(1, min(10, rag_fidelity_score))
 
-    # Extract issues
+    approved_match = re.search(r"\**Approved\**[:\s]*(YES|NO)", text, re.IGNORECASE)
+    if approved_match:
+        approved = approved_match.group(1).upper() == "YES"
+    else:
+        approved = (
+            score >= APPROVAL_THRESHOLD
+            and rag_fidelity_score >= RAG_FIDELITY_THRESHOLD
+        )
+
     issues = []
     issues_match = re.search(
-        r"\**Issues Found\**[:\s]*(.*?)(?=\n\s*[-*]?\s*\**Revised|\Z)",
+        r"\**Issues Found\**[:\s]*(.*?)(?=\n\s*[-*]?\s*\**RAG|\n\s*[-*]?\s*\**Revised|\Z)",
         text,
         re.IGNORECASE | re.DOTALL,
     )
     if issues_match:
         issues_text = issues_match.group(1).strip()
         if issues_text.lower() not in ("none", "none.", "no issues", "no issues found"):
-            # Split by newlines or bullet points
             for line in issues_text.split("\n"):
                 line = line.strip().lstrip("-*• ").strip()
                 if line and len(line) > 3:
                     issues.append(line)
 
-    # Extract revised article (if provided)
+    rag_issues = []
+    rag_issues_match = re.search(
+        r"\**RAG Issues\**[:\s]*(.*?)(?=\n\s*[-*]?\s*\**Revised|\Z)",
+        text,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if rag_issues_match:
+        rag_text = rag_issues_match.group(1).strip()
+        if rag_text.lower() not in ("none", "none.", "no issues", "no rag issues"):
+            for line in rag_text.split("\n"):
+                line = line.strip().lstrip("-*• ").strip()
+                if line and len(line) > 3:
+                    rag_issues.append(line)
+
     revised_match = re.search(
         r"\**Revised Article\**[:\s]*(.*)",
         text,
@@ -260,42 +218,31 @@ def _parse_review_response(text: str) -> ReviewResult:
         approved=approved,
         issues=issues,
         revised_article=revised_article,
-        review_notes=f"LLM review completed. Score: {score}/10.",
+        review_notes=f"LLM review completed. Score: {score}/10, RAG: {rag_fidelity_score}/10.",
+        rag_fidelity_score=rag_fidelity_score,
+        rag_issues=rag_issues,
     )
 
 
-def _review_by_llm(article: MagazineArticle) -> ReviewResult:
-    """
-    Reviews an article using the Groq LLM (primary method).
-
-    How it works:
-        1. Formats the article as readable text
-        2. Sends to LLM with REVIEWER_PROMPT
-        3. Parses the review response
-
-    Args:
-        article: A MagazineArticle to review
-
-    Returns:
-        A ReviewResult from the LLM review
-
-    Raises:
-        Exception: If the API call fails
-    """
+def _review_by_llm(
+    article: MagazineArticle,
+    rag_context: str = "",
+) -> ReviewResult:
+    """Reviews an article using the Groq LLM (primary method)."""
     from langchain_groq import ChatGroq
 
     llm = ChatGroq(
         api_key=settings.GROQ_API_KEY,
         model=settings.GROQ_MODEL,
-        temperature=0.3,  # Low temperature for consistent reviews
+        temperature=0.3,
         max_tokens=2000,
     )
 
-    # Format the article for review
     article_text = _format_article_for_review(article)
-
-    # Send to LLM
-    prompt = REVIEWER_PROMPT.format(article=article_text)
+    prompt = REVIEWER_PROMPT.format(
+        article=article_text,
+        rag_context=rag_context or "No knowledge base context available.",
+    )
     response = llm.invoke(prompt)
     raw_text = response.content.strip()
 
@@ -304,38 +251,30 @@ def _review_by_llm(article: MagazineArticle) -> ReviewResult:
     return _parse_review_response(raw_text)
 
 
-def review_article(article: MagazineArticle) -> ReviewResult:
-    """
-    Reviews a single magazine article.
-
-    Strategy:
-        1. Try LLM review (if API key is available)
-        2. Fall back to rule-based review
-
-    Args:
-        article: A MagazineArticle to review
-
-    Returns:
-        A ReviewResult with score, issues, and approval
-    """
-    # Try LLM review first
+def review_article(
+    article: MagazineArticle,
+    rag_context: str = "",
+    rag_sources: list[str] | None = None,
+) -> ReviewResult:
+    """Reviews a single magazine article with optional RAG verification."""
     if settings.GROQ_API_KEY and settings.GROQ_API_KEY != "your_groq_api_key_here":
         try:
-            result = _review_by_llm(article)
+            result = _review_by_llm(article, rag_context=rag_context)
             logger.debug(
                 f"LLM reviewed '{article.title[:40]}...' — "
                 f"Score: {result.quality_score}/10, "
+                f"RAG: {result.rag_fidelity_score}/10, "
                 f"Approved: {result.approved}"
             )
             return result
         except Exception as e:
             logger.warning(f"LLM review failed: {e}. Using rule-based fallback.")
 
-    # Fallback: rule-based review
-    result = _review_by_rules(article)
+    result = _review_by_rules(article, rag_context=rag_context)
     logger.debug(
         f"Rule-based reviewed '{article.title[:40]}...' — "
         f"Score: {result.quality_score}/10, "
+        f"RAG: {result.rag_fidelity_score}/10, "
         f"Approved: {result.approved}"
     )
     return result
@@ -343,25 +282,15 @@ def review_article(article: MagazineArticle) -> ReviewResult:
 
 def review_articles(
     articles: list[MagazineArticle],
+    rag_contexts: list[str] | None = None,
 ) -> list[ReviewResult]:
-    """
-    Reviews a list of magazine articles.
-
-    This is the main entry point for the Reviewer Agent.
-
-    Args:
-        articles: List of MagazineArticle objects
-
-    Returns:
-        List of ReviewResult objects (one per article)
-    """
+    """Reviews a list of magazine articles with optional RAG contexts."""
     if not articles:
         logger.info("No articles to review")
         return []
 
     logger.info(f"Reviewing {len(articles)} articles...")
 
-    # Determine method
     using_llm = (
         settings.GROQ_API_KEY
         and settings.GROQ_API_KEY != "your_groq_api_key_here"
@@ -369,11 +298,12 @@ def review_articles(
     method = "LLM (Groq)" if using_llm else "rule-based (fallback)"
     logger.info(f"Review method: {method}")
 
+    contexts = rag_contexts or [""] * len(articles)
     results = []
     approved_count = 0
 
-    for article in articles:
-        result = review_article(article)
+    for article, rag_context in zip(articles, contexts):
+        result = review_article(article, rag_context=rag_context)
         results.append(result)
         if result.approved:
             approved_count += 1
@@ -388,40 +318,23 @@ def review_articles(
     return results
 
 
-# ============================================
-# LangGraph Node Function
-# ============================================
-
 def reviewer_node(state: dict) -> dict:
-    """
-    LangGraph node function for the Reviewer Agent.
-
-    Implements the Reflection Pattern:
-        1. Review all magazine articles
-        2. If any article scores below threshold, log the issues
-        3. In a full implementation, low-scoring articles would be
-           sent back to the Writer Agent for revision
-
-    Note on the Reflection Pattern:
-        The full reflection loop (Writer → Reviewer → Writer → Reviewer)
-        is implemented in the LangGraph Orchestrator (Phase 9), not here.
-        This node only does the REVIEW step. The Orchestrator handles
-        the loop logic with conditional edges.
-
-    Args:
-        state: The current pipeline state dictionary
-
-    Returns:
-        Dictionary with state updates:
-        - "review_results": list of ReviewResult objects
-        - "current_stage": updated to "review_complete"
-    """
+    """LangGraph node function for the Reviewer Agent."""
     logger.info("Reviewer Agent starting...")
 
     magazine_articles = state.get("magazine_articles", [])
-    review_results = review_articles(magazine_articles)
+    enriched_articles = state.get("enriched_articles", [])
 
-    # Log summary
+    rag_contexts = [
+        ea.rag_context if hasattr(ea, "rag_context") else ea.get("rag_context", "")
+        for ea in enriched_articles
+    ]
+
+    while len(rag_contexts) < len(magazine_articles):
+        rag_contexts.append("")
+
+    review_results = review_articles(magazine_articles, rag_contexts=rag_contexts)
+
     approved = sum(1 for r in review_results if r.approved)
     logger.info(
         f"Reviewer Agent finished. "

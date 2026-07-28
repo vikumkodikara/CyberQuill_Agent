@@ -54,6 +54,34 @@ if not classified:
     st.warning("No classified articles available.")
     st.stop()
 
+# ============================================
+# Uncategorized Warning
+# ============================================
+
+uncategorized_count = sum(1 for a in classified if a.category == "Uncategorized")
+uncategorized_rate = (uncategorized_count / len(classified)) * 100 if classified else 0
+
+if uncategorized_count > 0:
+    if uncategorized_rate > 5:
+        st.warning(
+            f"**{uncategorized_count} articles ({uncategorized_rate:.1f}%)** are Uncategorized. "
+            f"Target is 2-3%. Review uncategorized items below or click Re-classify."
+        )
+    else:
+        st.info(
+            f"{uncategorized_count} article(s) ({uncategorized_rate:.1f}%) remain Uncategorized — within acceptable range."
+        )
+
+quick_col1, quick_col2, _ = st.columns([1, 1, 2])
+with quick_col1:
+    if st.button("🔎 Show Uncategorized Only", use_container_width=True):
+        st.session_state["category_filter"] = "Uncategorized"
+        st.rerun()
+with quick_col2:
+    if st.button("📋 Show All Categories", use_container_width=True):
+        st.session_state["category_filter"] = "All Categories"
+        st.rerun()
+
 
 # ============================================
 # Category Distribution
@@ -163,13 +191,22 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+category_options = ["All Categories"] + sorted(categories.keys())
+default_filter = st.session_state.get("category_filter", "All Categories")
+if default_filter not in category_options:
+    default_filter = "All Categories"
+
 selected_cat = st.selectbox(
     "Filter by Category",
-    options=["All Categories"] + sorted(categories.keys()),
+    options=category_options,
+    index=category_options.index(default_filter),
 )
 
 if selected_cat == "All Categories":
-    display_articles = classified
+    display_articles = sorted(
+        classified,
+        key=lambda a: (a.category == "Uncategorized", a.title),
+    )
 else:
     display_articles = [a for a in classified if a.category == selected_cat]
 
@@ -182,6 +219,15 @@ for article in display_articles:
 
     conf_pct = int(article.confidence * 100)
     confidence_label = f"Relevance: {conf_pct}%"
+    method = getattr(article, "classification_method", "") or "unknown"
+    method_labels = {
+        "llm": "LLM",
+        "keyword": "Keywords",
+        "forced_llm": "Forced LLM",
+        "best_guess": "Best guess",
+        "uncategorized": "Unclassified",
+    }
+    method_label = method_labels.get(method, method)
 
     article_html = (
         f'<div style="background: #111827; border: 1px solid #1F2937; border-left: 3px solid {border_color}; border-radius: 0 8px 8px 0; padding: 18px 20px; margin-bottom: 10px;">'
@@ -195,6 +241,7 @@ for article in display_articles:
         f'<span style="color: #00D4FF;">📡 {article.source}</span>'
         f'<span style="color: #64748B;">🗓️ {article.published or "Recent"}</span>'
         f'<span style="color: {border_color};">🎯 {confidence_label}</span>'
+        f'<span style="color: #A78BFA;">⚙️ {method_label}</span>'
         f'</div>'
         f'<div style="font-size: 13px; color: #94A3B8; line-height: 1.6;">'
         f'{article.summary[:300] + ("..." if len(article.summary) > 300 else "") if article.summary else "No preview summary available."}'

@@ -116,6 +116,10 @@ class ClassifiedArticle(Article):
         le=1.0,  # le = less than or equal to
         description="Classification confidence score (0.0 to 1.0)"
     )
+    classification_method: str = Field(
+        default="",
+        description="Method used: llm, keyword, forced_llm, best_guess, uncategorized"
+    )
 
 
 # ============================================
@@ -229,6 +233,16 @@ class ReviewResult(BaseModel):
     review_notes: str = Field(
         default="",
         description="Editor's notes and feedback"
+    )
+    rag_fidelity_score: int = Field(
+        default=10,
+        ge=1,
+        le=10,
+        description="How well the article aligns with RAG knowledge base context (1-10)"
+    )
+    rag_issues: list[str] = Field(
+        default_factory=list,
+        description="Claims unsupported or contradicted by RAG context"
     )
 
 

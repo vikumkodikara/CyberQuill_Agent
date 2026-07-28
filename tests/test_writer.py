@@ -26,13 +26,14 @@ Dependencies:
 import pytest
 
 from agents.writer import (
+    RAG_CONTEXT_MAX_CHARS,
     _extract_section,
     _parse_llm_sections,
     _write_by_template,
     write_article,
     write_articles,
 )
-from models.schemas import EnrichedArticle, MagazineArticle
+from models.schemas import EnrichedArticle, MagazineArticle, ReviewResult
 
 
 # ============================================
@@ -243,6 +244,44 @@ class TestWriteArticle:
         article = make_enriched(rag_context="", rag_sources=[])
         result = write_article(article)
         assert result.background != ""
+
+    def test_revision_falls_back_to_template(self):
+        """Revision without LLM should fall back to template writing."""
+        enriched = make_enriched()
+        previous = _write_by_template(enriched)
+        review = ReviewResult(
+            quality_score=5,
+            approved=False,
+            issues=["Technical analysis too shallow"],
+            rag_issues=["Missing OWASP references"],
+            rag_fidelity_score=4,
+        )
+        result = write_article(
+            enriched,
+            previous_article=previous,
+            review_result=review,
+        )
+        assert isinstance(result, MagazineArticle)
+        assert result.title != ""
+
+
+# ============================================
+# Tests for RAG context limits
+# ============================================
+
+class TestRagContextLimits:
+    """Tests for RAG context handling in writer."""
+
+    def test_template_uses_extended_context(self):
+        """Template should use more than 800 chars of RAG context."""
+        long_context = "injection vulnerability " * 200
+        article = make_enriched(rag_context=long_context)
+        result = _write_by_template(article)
+        assert len(result.background) > 800
+
+    def test_max_chars_constant(self):
+        """RAG context max should be 3000 chars."""
+        assert RAG_CONTEXT_MAX_CHARS == 3000
 
 
 # ============================================
