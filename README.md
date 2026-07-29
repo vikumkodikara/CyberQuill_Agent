@@ -2,7 +2,7 @@
 
 **CyberQuill** is an autonomous multi-agent cybersecurity intelligence platform orchestrated with [LangGraph](https://github.com/langchain-ai/langgraph). Specialized AI agents collect news from multiple RSS feeds, deduplicate articles, classify security threats, enrich content using Retrieval-Augmented Generation (RAG) over a vector store, write magazine-style analytical articles, perform reflection quality reviews, and generate downloadable PDF magazines.
 
-**Live Streamlit Demo :** https://cyberquillagent-93zujbgqd8wwfuzm4why6b.streamlit.app/
+**Live Streamlit Demo :** [https://cyberquillagent-93zujbgqd8wwfuzm4why6b.streamlit.app/](https://cyberquill-by-nima.streamlit.app/)
 ## 🏗️ Architecture
 
 ```
