@@ -1,6 +1,5 @@
 """
 CyberQuill Configuration Module
-================================
 
 Purpose:
     Loads all configuration from environment variables (.env file) into

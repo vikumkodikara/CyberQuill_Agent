@@ -1,6 +1,5 @@
 """
 CyberQuill Duplicate Detection Agent
-=======================================
 
 Purpose:
     Removes duplicate articles from the collected news feed.
