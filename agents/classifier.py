@@ -1,6 +1,5 @@
 """
 CyberQuill Classification Agent
-==================================
 
 Purpose:
     Classifies cybersecurity articles into threat categories using a

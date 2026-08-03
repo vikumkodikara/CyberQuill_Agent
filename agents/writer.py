@@ -1,6 +1,5 @@
 """
 CyberQuill Writer Agent
-=========================
 
 Purpose:
     Transforms enriched articles into professional magazine-style articles.

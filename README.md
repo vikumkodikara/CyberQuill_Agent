@@ -1,9 +1,9 @@
-# 🛡️ CyberQuill — Autonomous Multi-Agent Cybersecurity Intelligence & Magazine Platform
+# CyberQuill — Autonomous Multi-Agent Cybersecurity Intelligence & Magazine Platform
 
 **CyberQuill** is an autonomous multi-agent cybersecurity intelligence platform orchestrated with [LangGraph](https://github.com/langchain-ai/langgraph). Specialized AI agents collect news from multiple RSS feeds, deduplicate articles, classify security threats, enrich content using Retrieval-Augmented Generation (RAG) over a vector store, write magazine-style analytical articles, perform reflection quality reviews, and generate downloadable PDF magazines.
 
-**Live Streamlit Demo :** [https://cyberquillagent-93zujbgqd8wwfuzm4why6b.streamlit.app/](https://cyberquill-by-nima.streamlit.app/)
-## 🏗️ Architecture
+**Live Streamlit Demo:** [https://cyberquillagent-93zujbgqd8wwfuzm4why6b.streamlit.app/]
+## Architecture
 
 ```
 Collector → Duplicate → Classifier → RAG → Writer → Reviewer → PDF
@@ -28,7 +28,7 @@ CyberQuill uses a **sequential pipeline** of 6 AI agents orchestrated by [LangGr
 - [Groq API Key](https://console.groq.com/keys)
 - [OpenRouter API Key](https://openrouter.ai/keys)
 
-## 🚀 Quick Start (Local)
+## Quick Start (Local)
 
 ```bash
 # 1. Clone the repository
@@ -56,15 +56,15 @@ streamlit run streamlit_app.py
 
 ---
 
-## 🏗️ Architecture & Pipeline Flow
+## Architecture & Pipeline Flow
 
 ```mermaid
 graph TD
-    subgraph Feeds["📰 Data Ingestion"]
+    subgraph Feeds["Data Ingestion"]
         RSS["RSS Feeds (6 Outlets)"]
     end
 
-    subgraph Pipeline["🤖 LangGraph Multi-Agent Sequential Pipeline"]
+    subgraph Pipeline["LangGraph Multi-Agent Sequential Pipeline"]
         Collector["Stage 1: Collector Agent<br/>(RSS Parsing)"]
         Duplicate["Stage 2: Deduplication Agent<br/>(URL & Title Normalization)"]
         Classifier["Stage 3: Classifier Agent<br/>(Security Domain Tagging)"]
@@ -75,7 +75,7 @@ graph TD
         PDF["Stage 7: PDF Generator<br/>(ReportLab Rendering)"]
     end
 
-    subgraph Knowledge["📚 Vector Knowledge Store"]
+    subgraph Knowledge["Vector Knowledge Store"]
         Chroma["ChromaDB Vector Store<br/>(OWASP, MITRE ATT&CK, NIST CSF)"]
     end
 
@@ -89,7 +89,7 @@ graph TD
     Reviewer --> Decision
     Decision -- "No (Score < 7 & Revisions < Max)" --> Writer
     Decision -- "Yes (Score >= 7 OR Max Revisions)" --> PDF
-    PDF --> Output["📄 Final Magazine PDF & Streamlit Issue"]
+    PDF --> Output["Final Magazine PDF & Streamlit Issue"]
 
     classDef agent fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
     classDef decision fill:#7c2d12,stroke:#f97316,stroke-width:2px,color:#fff;
@@ -116,7 +116,7 @@ graph TD
 
 ---
 
-## 🔄 Agent-to-Agent Communication
+## Agent-to-Agent Communication
 
 Agents exchange strongly-typed Pydantic report contracts through a shared LangGraph state (`CyberQuillState`) rather than unstructured free-form text.
 
@@ -130,7 +130,7 @@ Report contracts are defined in [`models/schemas.py`](file:///e:/Projects/CyberQ
 
 ---
 
-## 🤖 AI Design Patterns
+## AI Design Patterns
 
 | Pattern | Implementation File | Role in CyberQuill |
 | :--- | :--- | :--- |
@@ -142,7 +142,7 @@ Report contracts are defined in [`models/schemas.py`](file:///e:/Projects/CyberQ
 
 ---
 
-## 🧠 Model Selection Strategy
+## Model Selection Strategy
 
 | Sub-task | Provider | Model | Latency | Cost | Context / Reasoning | Why Selected |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -153,7 +153,7 @@ Report contracts are defined in [`models/schemas.py`](file:///e:/Projects/CyberQ
 
 ---
 
-## 📚 Retrieval-Augmented Generation (RAG) Architecture
+## Retrieval-Augmented Generation (RAG) Architecture
 
 APIs supply dynamic real-time headlines, while the local RAG knowledge base provides evergreen cybersecurity frameworks and vulnerability guidance.
 
@@ -179,7 +179,7 @@ APIs supply dynamic real-time headlines, while the local RAG knowledge base prov
 
 ---
 
-## 🌐 Live Data Sources & Fallbacks
+## Live Data Sources & Fallbacks
 
 | Concern | Source | Fallback Mechanism |
 | :--- | :--- | :--- |
@@ -190,7 +190,7 @@ APIs supply dynamic real-time headlines, while the local RAG knowledge base prov
 
 ---
 
-## 🎓 Educational Purpose & Legal Disclaimer
+## Educational Purpose & Legal Disclaimer
 
 > [!IMPORTANT]
 > **This project is strictly developed for educational, academic, and research purposes only.**
@@ -201,7 +201,7 @@ APIs supply dynamic real-time headlines, while the local RAG knowledge base prov
 
 ---
 
-## 📰 News Source Credits & Attribution
+## News Source Credits & Attribution
 
 CyberQuill aggregates real-time security intelligence using public RSS feeds from prominent cybersecurity journalism outlets and official government advisory channels. Full credit, copyright, and publishing rights belong entirely to the original content creators listed below:
 
@@ -218,7 +218,7 @@ CyberQuill aggregates real-time security intelligence using public RSS feeds fro
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 CyberQuill/
@@ -267,7 +267,7 @@ CyberQuill/
 
 ---
 
-## ☁️ Deployment Checklist (Streamlit Community Cloud)
+## Deployment Checklist (Streamlit Community Cloud)
 
 1. Push your repository to GitHub (`github.com/vikumkodikara/CyberQuill_Agent`).
 2. Go to [share.streamlit.io](https://share.streamlit.io/) → **New App**.
@@ -281,7 +281,7 @@ CyberQuill/
 
 ---
 
-## 🧪 Automated Testing
+## Automated Testing
 
 Run the full pytest suite to verify all agents, schemas, and pipeline execution locally:
 
@@ -291,13 +291,13 @@ pytest tests/ -v
 
 ---
 
-## 📄 License & Fair Use
+## License & Fair Use
 
 This project is open-sourced strictly for academic, educational, and research evaluation under non-commercial terms.
 
 ---
 
-## 👤 Author
+## Author
 
 **Vikum Kodikara**  
 [GitHub Profile](https://github.com/vikumkodikara)

@@ -1,6 +1,5 @@
 """
 CyberQuill Prompt Templates
-=============================
 
 Purpose:
     Stores all LLM prompt templates in one place. This makes prompts
@@ -31,9 +30,7 @@ Possible improvements:
     - Add few-shot examples within prompts
 """
 
-# ============================================
 # Classification Agent Prompts
-# ============================================
 
 CLASSIFICATION_PROMPT = """You are a cybersecurity news classifier for CyberQuill magazine.
 
@@ -89,9 +86,7 @@ Article Summary: {summary}
 Pick the single best category:"""
 
 
-# ============================================
 # Writer Agent Prompts
-# ============================================
 
 WRITER_PROMPT = """You are a senior cybersecurity journalist and editor writing for
 "CyberQuill" — a professional cybersecurity intelligence magazine comparable to
@@ -135,9 +130,7 @@ Write in a professional, engaging, and informative tone.
 Format the output in Markdown with ## headings for each section."""
 
 
-# ============================================
 # Reviewer Agent Prompts
-# ============================================
 
 REVIEWER_PROMPT = """You are a senior editor for a cybersecurity magazine.
 
@@ -224,9 +217,7 @@ Provide your analysis in this format:
 - **Missing Context**: [important KB content not reflected in article, or "None"]"""
 
 
-# ============================================
 # Reviewer Reflection Prompt (Self-Critique)
-# ============================================
 
 REVIEWER_REFLECTION_PROMPT = """You are reviewing your own editorial review.
 

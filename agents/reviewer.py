@@ -1,6 +1,5 @@
 """
 CyberQuill Reviewer Agent
-============================
 
 Purpose:
     Reviews magazine articles for quality, completeness, and accuracy.

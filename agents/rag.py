@@ -1,6 +1,6 @@
 """
 CyberQuill RAG (Retrieval-Augmented Generation) Agent
-=======================================================
+
 
 Purpose:
     Enriches classified articles with relevant context from a cybersecurity

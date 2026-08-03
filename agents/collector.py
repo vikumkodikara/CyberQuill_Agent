@@ -1,6 +1,5 @@
 """
 CyberQuill Collector Agent
-============================
 
 Purpose:
     Fetches cybersecurity news articles from multiple RSS feeds and
