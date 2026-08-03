@@ -102,15 +102,6 @@ graph TD
     class PDF,Output output;
 ```
 
-```
-[ RSS Feeds ] ──▶ [ Collector ] ──▶ [ Duplicate ] ──▶ [ Classifier ] ──▶ [ RAG Agent ] ◀──▶ [ ChromaDB KB ]
-                                                                             │
-                                                                             ▼
-[ Final PDF ] ◀── [ PDF Generator ] ◀── [ Quality Gate ] ◀── [ Reviewer ] ◀── [ Writer Agent ]
-                                               │                                  │
-                                               └──────── ( Revision Loop ) ───────┘
-```
-
 ### Agent Roles & Responsibilities
 
 | Agent | Module Path | Role |
@@ -310,12 +301,3 @@ This project is open-sourced strictly for academic, educational, and research ev
 
 **Vikum Kodikara**  
 [GitHub Profile](https://github.com/vikumkodikara)
-
----
-
-## Known Limitations
-
-- **Pipeline Latency**: Running the full 6-agent pipeline with writing and reflection loops may take 1–3 minutes depending on LLM response speeds.
-- **RSS Feed Availability**: Intermittent downtime or structure changes in source RSS feeds can affect real-time article collection.
-- **API Rate Limits**: Rapid consecutive generations on free tier API keys (Groq/OpenRouter) may trigger rate limit warnings.
-- **RAG Context Window**: Large framework files are chunked to fit LLM context windows, which may truncate secondary details.
