@@ -65,8 +65,7 @@ Possible improvements:
     - Add retry logic for individual nodes
 """
 
-import operator
-from typing import Annotated, Any, TypedDict
+from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
@@ -83,17 +82,13 @@ class PipelineState(TypedDict, total=False):
     """
     The shared state that flows through the entire LangGraph pipeline.
 
-    Why TypedDict instead of Pydantic?
-        LangGraph requires TypedDict for its StateGraph. The Pydantic
-        PipelineState in models/schemas.py is used for data validation
-        elsewhere — this TypedDict is the LangGraph-compatible version.
+    LangGraph requires TypedDict for its StateGraph. Each agent node
+    reads what it needs and returns partial updates that merge into state.
 
     How state merging works:
         When a node returns {"raw_articles": [...]}, LangGraph REPLACES
         the "raw_articles" key in state. For list fields, we want
         replacement semantics (not append), so no reducer is needed.
-
-    Fields mirror the Pydantic PipelineState in models/schemas.py.
     """
     # Stage outputs
     raw_articles: list          # Collector → list[Article]
@@ -118,9 +113,6 @@ class PipelineState(TypedDict, total=False):
 
 # Maximum number of Writer→Reviewer revision cycles
 MAX_REVISION_CYCLES = 2
-
-# Minimum review score for approval
-APPROVAL_THRESHOLD = 7
 
 
 # ============================================

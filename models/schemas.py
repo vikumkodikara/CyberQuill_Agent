@@ -244,39 +244,3 @@ class ReviewResult(BaseModel):
         default_factory=list,
         description="Claims unsupported or contradicted by RAG context"
     )
-
-
-# ============================================
-# Pipeline State (for LangGraph)
-# ============================================
-
-class PipelineState(BaseModel):
-    """
-    The shared state object that flows through the LangGraph pipeline.
-    
-    LangGraph uses a "state" dictionary that all agents can read and write.
-    This model defines the structure of that state.
-    
-    Each agent reads what it needs and adds its output.
-    """
-    # Raw collected articles
-    raw_articles: list[Article] = Field(default_factory=list)
-    
-    # After duplicate removal
-    unique_articles: list[Article] = Field(default_factory=list)
-    
-    # After classification
-    classified_articles: list[ClassifiedArticle] = Field(default_factory=list)
-    
-    # After RAG enrichment
-    enriched_articles: list[EnrichedArticle] = Field(default_factory=list)
-    
-    # Generated magazine articles
-    magazine_articles: list[MagazineArticle] = Field(default_factory=list)
-    
-    # Review results (one per magazine article)
-    review_results: list[ReviewResult] = Field(default_factory=list)
-    
-    # Pipeline metadata
-    errors: list[str] = Field(default_factory=list)
-    current_stage: str = Field(default="idle")

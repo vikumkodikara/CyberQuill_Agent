@@ -9,7 +9,7 @@ Shows progress for each pipeline stage with reader-friendly status updates.
 import streamlit as st
 from pathlib import Path
 from datetime import datetime
-from utils.theme import render_page_header, get_category_badge_html, render_sidebar_controls, get_category_pill_style
+from utils.theme import render_page_header, render_sidebar_controls, get_category_pill_style
 from utils.helpers import estimate_article_reading_time
 from utils.content_sanitizer import sanitize_article
 

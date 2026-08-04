@@ -18,7 +18,6 @@ logger = get_logger(__name__)
 
 APPROVAL_THRESHOLD = 7
 RAG_FIDELITY_THRESHOLD = 6
-MAX_REVISIONS = 2
 
 MIN_SECTION_WORDS = {
     "executive_summary": 10,

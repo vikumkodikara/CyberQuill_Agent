@@ -7,7 +7,6 @@ Shows classification confidence and category distribution.
 """
 
 import streamlit as st
-import pandas as pd
 from utils.theme import render_page_header, get_category_badge_html, render_sidebar_controls, get_category_left_border
 
 st.set_page_config(page_title="Topics — CyberQuill", page_icon="🏷️", layout="wide")

@@ -729,20 +729,6 @@ def inject_dark_theme():
            CHART STYLING (Dark Theme Containers)
            ============================================= */
 
-        [data-testid="stPlotlyChart"],
-        .js-plotly-plot {
-            background-color: #111827 !important;
-            border: 1px solid #1F2937 !important;
-            border-radius: 8px !important;
-            padding: 8px !important;
-        }
-
-        .js-plotly-plot .plotly,
-        .js-plotly-plot .plotly .bg {
-            background: transparent !important;
-            background-color: transparent !important;
-        }
-
         /* Streamlit Vega-Lite / bar chart dark container */
         [data-testid="stVegaLiteChart"] {
             background-color: #111827 !important;

@@ -235,11 +235,6 @@ class TestConstants:
         assert isinstance(MAX_REVISION_CYCLES, int)
         assert MAX_REVISION_CYCLES > 0
 
-    def test_approval_threshold_valid(self):
-        """Approval threshold should be between 1 and 10."""
-        from orchestrator.pipeline import APPROVAL_THRESHOLD
-        assert 1 <= APPROVAL_THRESHOLD <= 10
-
 
 # ============================================
 # Test Run Pipeline Function Exists
