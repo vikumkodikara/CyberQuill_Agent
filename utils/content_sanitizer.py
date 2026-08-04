@@ -21,7 +21,6 @@ pipeline state, or the data stored in ChromaDB.
 """
 
 import re
-from typing import Optional
 
 from models.schemas import MagazineArticle
 
@@ -391,17 +390,3 @@ def _clean_title(title: str) -> str:
     # Clean up whitespace
     title = re.sub(r"\s{2,}", " ", title).strip()
     return title
-
-
-# ============================================
-# Batch Operations
-# ============================================
-
-def sanitize_articles(
-    articles: list[MagazineArticle],
-) -> list[MagazineArticle]:
-    """
-    Sanitizes a list of magazine articles.
-    Convenience wrapper around sanitize_article().
-    """
-    return [sanitize_article(a) for a in articles]
